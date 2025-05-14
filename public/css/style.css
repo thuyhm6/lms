@@ -1883,9 +1883,71 @@ a:hover, a:focus {
 }
 .wg-filter form {
   width: 100%;
-  max-width: 458px;
+  max-width: 100%;
+}
+.action-wrapper {
+  position: relative;
+  display: inline-block;
 }
 
+.action-icon {
+  cursor: pointer;
+  padding: 5px;
+  font-size: 18px;
+  color: #6b7280;
+}
+
+.action-icon:hover {
+  color: #1e40af;
+}
+
+.action-popup {
+  position: absolute;
+  top: 20%;
+  left: 120%;
+  background-color: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  min-width: 120px;
+  padding: 5px 0;
+}
+
+.action-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  color: #374151;
+  text-decoration: none;
+  font-size: 14px;
+  gap: 8px;
+}
+
+.action-item:hover {
+  background-color: #f3f4f6;
+}
+
+.action-button {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: inherit;
+  width: 100%;
+  text-align: left;
+}
+
+.action-button.delete {
+  color: #dc3545;
+}
+
+.action-popup[style*="display: none"] {
+  display: none !important;
+}
 .list-icon-function {
   display: -webkit-box;
   display: -moz-box;
@@ -1895,6 +1957,7 @@ a:hover, a:focus {
   align-items: center;
   justify-content: start;
   gap: 20px;
+  width: 100px;
 }
 .list-icon-function .item {
   font-size: 20px;

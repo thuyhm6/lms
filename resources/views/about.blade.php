@@ -1,4 +1,4 @@
-@extends('layouts.app') {{-- //HMT Cần check chỗ này --}}
+@extends('layouts.app') {{-- //Cần check chỗ này --}}
 @section('title', 'Về chúng tôi')
 @section('content')
 <main class="pt-90">

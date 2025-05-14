@@ -9,7 +9,7 @@ class Product extends Model
 {
     use HasFactory;
 
-    //HMT lưu ý đoạn này
+    //lưu ý đoạn này
     public function category() {
         return $this->belongsTo(Category::class, 'category_id'); // Thay Category bằng tên của model Category
     }

@@ -32,12 +32,12 @@
                         </div>
                     </form>
                 </div>
-                <a class="tf-button style-1 w208" href="{{ route('admin.product.add') }}"><i
+                <a class="tf-button style-1 w208" href="{{ route('admin.parent.add') }}"><i
                         class="icon-plus"></i>Add new</a>
             </div>
             <div class="table-responsive">
                 @if(Session::has('status'))
-                    <p class="alert alert-success">{{ Session::get('status') }}</p> {{-- HMT Chỗ này cũng cần lưu ý --}}
+                    <p class="alert alert-success">{{ Session::get('status') }}</p> {{-- Chỗ này cũng cần lưu ý --}}
                 @endif
                 <table class="table table-striped table-bordered">
                     <thead>
@@ -83,7 +83,7 @@
                                             <i class="icon-eye"></i>
                                         </div>
                                     </a>
-                                    <a href="{{ route('admin.product.edit', ['id'=>$product->id]) }}">
+                                    <a href="{{ route('admin.parent.edit', ['id'=>$product->id]) }}">
                                         <div class="item edit">
                                             <i class="icon-edit-3"></i>
                                         </div>

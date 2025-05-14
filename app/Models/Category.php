@@ -9,7 +9,7 @@ class Category extends Model
 {
     use HasFactory;
 
-    //HMT Lưu ý đoạn này
+    //Lưu ý đoạn này
     public function products() {
         return $this->hasMany(Product::class);
     }

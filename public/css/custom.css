@@ -129,6 +129,7 @@ body {
     font-size: 14px;
     border: 1px solid #e1e1e1;
     vertical-align: middle;
+    width: 100px;
 }
 
 .table-striped .image {
@@ -148,7 +149,7 @@ body {
 
 .table-striped th:nth-child(2),
 .table-striped td:nth-child(2) {
-    width: 250px;
+    width: 50px;
     padding-bottom: 18px;
 }
 

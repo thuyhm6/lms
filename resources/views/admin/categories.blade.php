@@ -37,7 +37,7 @@
             <div class="wg-table table-all-user">
                 <div class="table-responsive">
                     @if(Session::has('status'))
-                        <p class="alert alert-success">{{ Session::get('status') }}</p> {{-- HMT Chỗ này cũng cần lưu ý --}}
+                        <p class="alert alert-success">{{ Session::get('status') }}</p> {{-- Chỗ này cũng cần lưu ý --}}
                     @endif
                     <table class="table table-striped table-bordered">
                         <thead>
@@ -65,14 +65,14 @@
                                 <td><a href="#" target="_blank">0</a></td>
                                 <td>
                                     <div class="list-icon-function">
-                                        <a href="{{ route('admin.category.edit',['id'=>$category->id]) }}"> {{-- HMT Lưu ý đoạn này --}}
+                                        <a href="{{ route('admin.category.edit',['id'=>$category->id]) }}"> {{-- Lưu ý đoạn này --}}
                                             <div class="item edit">
                                                 <i class="icon-edit-3"></i>
                                             </div>
                                         </a>
                                         <form action="{{ route('admin.category.delete',['id'=>$category->id]) }}" method="POST">
                                             @csrf
-                                            @method('DELETE') {{-- HMT Lưu ý đoạn này --}}
+                                            @method('DELETE') {{-- Lưu ý đoạn này --}}
                                             <div class="item text-danger delete">
                                                 <i class="icon-trash-2"></i>
                                             </div>

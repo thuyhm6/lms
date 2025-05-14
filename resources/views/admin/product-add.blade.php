@@ -15,20 +15,20 @@
                     <i class="icon-chevron-right"></i>
                 </li>
                 <li>
-                    <a href="{{ route('admin.products') }}">
-                        <div class="text-tiny">Products</div>
+                    <a href="{{ route('admin.parents') }}">
+                        <div class="text-tiny">Parents</div>
                     </a>
                 </li>
                 <li>
                     <i class="icon-chevron-right"></i>
                 </li>
                 <li>
-                    <div class="text-tiny">Add product</div>
+                    <div class="text-tiny">Add parent</div>
                 </li>
             </ul>
         </div>
-        <!-- form-add-product -->
-        <form class="tf-section-2 form-add-product" method="POST" enctype="multipart/form-data" action="{{ route('admin.product.store') }}">
+        <!-- form-add-parent -->
+        <form class="tf-section-2 form-add-parent" method="POST" enctype="multipart/form-data" action="{{ route('admin.parent.store') }}">
             @csrf
             <div class="wg-box">
                 <fieldset class="name">

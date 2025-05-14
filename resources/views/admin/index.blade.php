@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 @section('title', 'Admin - Quản trị website')
-@section('content') {{-- HMT Chỗ này cần xem lại --}}
+@section('content') {{-- Chỗ này cần xem lại --}}
 <div class="main-content-inner">
 
     <div class="main-content-wrap">

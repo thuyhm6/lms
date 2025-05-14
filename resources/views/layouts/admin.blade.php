@@ -3,6 +3,13 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Trong <head> -->
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
+    {{-- <script src="https://cdn.ckeditor.com/ckeditor5/41.1.0/classic/ckeditor.js"></script> --}}
+   <!-- Gọi CKEditor từ thư mục nội bộ -->
+    <script src="{{ asset('vendor/ckeditor4/ckeditor/ckeditor.js') }}"></script>
+
 
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -22,7 +29,12 @@
     <link rel="apple-touch-icon-precomposed" href="{{ asset('images/favicon.ico') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('css/sweetalert.min.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('css/custom.css') }}">
+    <!-- Trong <head> -->
+
     @stack("styles")
+{{-- <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" /> --}}
+
+
 </head>
 <body class="body">
     <div id="wrapper">
@@ -61,60 +73,77 @@
                             <ul class="menu-list">
                                 <li class="menu-item has-children">
                                     <a href="javascript:void(0);" class="menu-item-button">
-                                        <div class="icon"><i class="icon-shopping-cart"></i></div>
-                                        <div class="text">Products</div>
+                                        <div class="icon"><i class="icon-file-text"></i>
+                                        </div>
+                                        <div class="text">Tin tức</div>
                                     </a>
                                     <ul class="sub-menu">
                                         <li class="sub-menu-item">
-                                            <a href="{{ route('admin.product.add') }}" class="">
-                                                <div class="text">Add Product</div>
+                                            <a href="{{ route('admin.news') }}" class="">
+                                                <div class="text">Bài viết</div>
                                             </a>
                                         </li>
+
                                         <li class="sub-menu-item">
-                                            <a href="{{ route('admin.products') }}" class="">
-                                                <div class="text">Products</div>
+                                            <a href="{{ route('admin.topic') }}" class="">
+                                                <div class="text">Chủ đề</div>
                                             </a>
                                         </li>
                                     </ul>
                                 </li>
-                                <li class="menu-item has-children">
-                                    <a href="javascript:void(0);" class="menu-item-button">
-                                        <div class="icon"><i class="icon-layers"></i></div>
-                                        <div class="text">Brand</div>
+                                <li class="menu-item">
+                                    <a href="{{ route('admin.courses') }}" class="">
+                                        <div class="icon"><i class="icon-book-open"></i>
+                                        </div>
+                                        <div class="text">Khóa học</div>
                                     </a>
-                                    <ul class="sub-menu">
-                                        <li class="sub-menu-item">
-                                            <a href="{{ route('admin.brand.add') }}" class="">
-                                                <div class="text">New Brand</div>
-                                            </a>
-                                        </li>
-                                        <li class="sub-menu-item">
-                                            <a href="{{ route('admin.brands') }}" class="">
-                                                <div class="text">Brands</div>
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </li>
-                                <li class="menu-item has-children">
-                                    <a href="javascript:void(0);" class="menu-item-button">
-                                        <div class="icon"><i class="icon-layers"></i></div>
-                                        <div class="text">Category</div>
-                                    </a>
-                                    <ul class="sub-menu">
-                                        <li class="sub-menu-item">
-                                            <a href="{{ route('admin.category.add') }}" class="">
-                                                <div class="text">New Category</div>
-                                            </a>
-                                        </li>
-                                        <li class="sub-menu-item">
-                                            <a href="{{ route('admin.categories') }}" class="">
-                                                <div class="text">Categories</div>
-                                            </a>
-                                        </li>
-                                    </ul>
                                 </li>
 
-                                <li class="menu-item has-children">
+                                <li class="menu-item">
+                                    <a href="{{ route('admin.subjects') }}" class="">
+                                        <div class="icon"><i class="icon-book"></i>
+                                        </div>
+                                        <div class="text">Môn học</div>
+                                    </a>
+                                </li>
+                                <li class="menu-item">
+                                    <a href="{{ route('admin.parents') }}" class="">
+                                        <div class="icon"><i class="icon-user"></i></div>
+                                        <div class="text">Phụ huynh</div>
+                                    </a>
+                                </li>
+                                <li class="menu-item">
+                                    <a href="{{ route('admin.students') }}" class="">
+                                        <div class="icon"><i class="icon-user"></i></div>
+                                        <div class="text">Học sinh</div>
+                                    </a>
+                                </li>
+                                <li class="menu-item">
+                                    <a href="{{ route('admin.teachers') }}" class="">
+                                        <div class="icon"><i class="icon-user"></i></div>
+                                        <div class="text">Giáo viên</div>
+                                    </a>
+                                </li>
+                                <li class="menu-item">
+                                    <a href="{{ route('class.index') }}" class="">
+                                        <div class="icon"><i class="icon-image"></i></div>
+                                        <div class="text">Lớp học</div>
+                                    </a>
+                                </li>
+                                <li class="menu-item">
+                                    <a href="{{ route('schedules.index') }}" class="">
+                                        <div class="icon"><i class="icon-image"></i></div>
+                                        <div class="text">Lịch học</div>
+                                    </a>
+                                </li>
+                                <li class="menu-item">
+                                    <a href="{{ route('schedules.teacherSchedule') }}" class="">
+                                        <div class="icon"><i class="icon-image"></i></div>
+                                        <div class="text">Lịch dạy của của giáo viên</div>
+                                    </a>
+                                </li>
+
+                                {{-- <li class="menu-item has-children">
                                     <a href="javascript:void(0)" class="menu-item-button">
                                         <div class="icon"><i class="icon-file-plus"></i></div>
                                         <div class="text">Order</div>
@@ -156,7 +185,7 @@
                                         <div class="icon"><i class="icon-user"></i></div>
                                         <div class="text">User</div>
                                     </a>
-                                </li>
+                                </li> --}}
 
                                 <li class="menu-item">
                                     <a href="{{ route('admin.settings') }}" class="">
@@ -165,7 +194,7 @@
                                     </a>
                                 </li>
 
-                                
+
                             </ul>
                         </div>
                     </div>
@@ -322,7 +351,7 @@
                                             </li>
                                             <li>
                                                 <form action="{{ route('logout') }}" method="POST" id="logout-form">
-                                                    @csrf {{-- HMT Xem lại đoạn này --}}
+                                                    @csrf {{-- Xem lại đoạn này --}}
                                                     <a href="{{ route('logout') }}" class="user-item" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                                                         <div class="icon"><i class="icon-log-out"></i></div>
                                                         <div class="body-title-2">Logout</div>
@@ -337,7 +366,7 @@
                         </div>
                     </div>
                     <div class="main-content">
-                        @yield('content')                    
+                        @yield('content')
 
                         <div class="bottom-page">
                             <div class="body-text">Copyright © 2024 </div>
@@ -351,8 +380,8 @@
 
     <script src="{{ asset('js/jquery.min.js') }}"></script>
     <script src="{{ asset('js/bootstrap.min.js') }}"></script>
-    <script src="{{ asset('js/bootstrap-select.min.js') }}"></script>   
-    <script src="{{ asset('js/sweetalert.min.js') }}"></script>    
+    <script src="{{ asset('js/bootstrap-select.min.js') }}"></script>
+    <script src="{{ asset('js/sweetalert.min.js') }}"></script>
     <script src="{{ asset('js/apexcharts/apexcharts.js') }}"></script>
     <script>
         $(function(){
@@ -367,9 +396,9 @@
                 success: function(data) {
                   $("#box-content-search").html('');
                   $.each(data, function(index, item){
-                    var url = "{{ route('admin.product.edit', ['id'=>'product_id']) }}";
+                    var url = "{{ route('admin.parent.edit', ['id'=>'product_id']) }}";
                     var link = url.replace('product_id', item.id);
-  
+
                     $("#box-content-search").append(`
                       <li class="product-item gap14 mb-10">
                         <a href="${link}">
@@ -395,7 +424,9 @@
         })
       </script>
     <script src="{{ asset('js/main.js') }}"></script>
-    
+
     @stack("scripts");
+
+     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 </body>
 </html>

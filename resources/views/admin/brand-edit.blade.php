@@ -30,7 +30,7 @@
         <div class="wg-box">
             <form class="form-new-product form-style-1" action="{{ route('admin.brand.update') }}" method="POST" enctype="multipart/form-data">
                 @csrf
-                @method('PUT') {{-- HMT lưu ý đonạ này --}}
+                @method('PUT') {{-- lưu ý đonạ này --}}
                 <input type="hidden" name="id" value="{{ $brand->id }}"/>
                 <fieldset class="name">
                     <div class="body-title">Brand Name <span class="tf-color-1">*</span></div>

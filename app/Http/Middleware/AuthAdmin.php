@@ -16,7 +16,7 @@ class AuthAdmin
      */
     public function handle(Request $request, Closure $next): Response
     {
-        //HMT Cần check chỗ này
+        //Cần check chỗ này
         if(Auth::check()){
             if(Auth::user()->utype === 'ADM') {
                 return $next($request);

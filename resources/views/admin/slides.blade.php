@@ -38,7 +38,7 @@
             <div class="wg-table table-all-user">
                 <div class="table-responsive">
                     @if(Session::has('status'))
-                        <p class="alert alert-success">{{ Session::get('status') }}</p> {{-- HMT Chỗ này cũng cần lưu ý --}}
+                        <p class="alert alert-success">{{ Session::get('status') }}</p> {{-- Chỗ này cũng cần lưu ý --}}
                     @endif
                 <table class="table table-striped table-bordered">
                     <thead>
