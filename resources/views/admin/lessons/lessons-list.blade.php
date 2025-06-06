@@ -28,23 +28,55 @@
             left: auto;
         }
 
-
-        .table-responsive {
-            overflow: visible !important;
+        .custom-modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
         }
 
-        .dropdown-menu {
+        .custom-modal-content {
+            background-color: #fff;
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 80%;
+            height: 90vh;
+            position: relative;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .custom-close {
+            color: #aaa;
             position: absolute;
-            z-index: 1050;
+            top: 10px;
+            right: 20px;
+            font-size: 28px;
+            cursor: pointer;
         }
 
-        .dropdown-menu.show {
-            display: block;
+        .custom-close:hover {
+            color: black;
         }
 
-        .dropdown-menu-end {
-            right: 0;
-            left: auto;
+
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
         }
     </style>
     <div class="main-content-inner">
@@ -81,7 +113,6 @@
                             @php
                                 $displayedTopics = [];
                             @endphp
-
                             @foreach ($lessons as $lesson)
                                 @if (!in_array($lesson->topic, $displayedTopics))
                                     <option value="{{ $lesson->topic }}">{{ $lesson->topic }}</option>
@@ -90,12 +121,10 @@
                                     @endphp
                                 @endif
                             @endforeach
-
                         </select>
                     </div>
 
                     @php
-                        // Khởi tạo mảng để lưu các giá trị đã xuất hiện
                         $displayedFeeTypes = [];
                         $displayedFileTypes = [];
                     @endphp
@@ -108,7 +137,6 @@
                                 @if (!in_array($lesson->fee_type, $displayedFeeTypes))
                                     <option value="{{ $lesson->fee_type }}">{{ $lesson->fee_type }}</option>
                                     @php
-                                        // Thêm fee_type vào mảng sau khi đã hiển thị
                                         $displayedFeeTypes[] = $lesson->fee_type;
                                     @endphp
                                 @endif
@@ -124,14 +152,12 @@
                                 @if (!in_array($lesson->file_type, $displayedFileTypes))
                                     <option value="{{ $lesson->file_type }}">{{ $lesson->file_type }}</option>
                                     @php
-                                        // Thêm file_type vào mảng sau khi đã hiển thị
                                         $displayedFileTypes[] = $lesson->file_type;
                                     @endphp
                                 @endif
                             @endforeach
                         </select>
                     </div>
-
 
                     <div class="col-md-3">
                         <label for="keyword" class="form-label">Từ khóa</label>
@@ -144,10 +170,8 @@
                     </div>
 
                     <input type="hidden" name="limit" id="limit" value="10">
-
                 </form>
             </div>
-
 
             <div class="wg-box">
                 <div class="flex items-center justify-between gap10 flex-wrap">
@@ -208,14 +232,12 @@
                                                 <i class="icon-settings fs-4"></i>
                                             </div>
                                             <ul class="dropdown-menu">
-                                                {{-- <li class="py-2">
-                                                <a class="dropdown-item d-flex align-items-center gap-2" href="{{ route('admin.lessons', ['id'=>$lesson->id]) }}"
-                                                    target="_blank">
-                                                    <div class="item eye py-2">
-                                                        <i class="icon-eye"></i> Chi tiết
+                                                <li class="py-2">
+                                                    <div class="dropdown-item d-flex align-items-center gap-2 py-2 btn"
+                                                        onclick="openModal('modal-{{ $lesson->id }}')">
+                                                        <i class="icon-eye text-primary"></i> Xem
                                                     </div>
-                                                </a>
-                                            </li> --}}
+                                                </li>
                                                 <li class="py-2">
                                                     <a class="dropdown-item d-flex align-items-center gap-2 py-2 btn"
                                                         href="{{ route('admin.lessons.edit', ['id' => $lesson->id]) }}">
@@ -238,6 +260,16 @@
                                         </div>
                                     </td>
                                 </tr>
+
+                                <!-- Modal for lesson {{ $lesson->id }} -->
+                                <div id="modal-{{ $lesson->id }}" class="custom-modal">
+                                    <div class="custom-modal-content">
+                                        <span class="custom-close" onclick="closeModal('modal-{{ $lesson->id }}')">×</span>
+                                        <div id="modalContent-{{ $lesson->id }}">
+                                            <iframe src="{{ asset($lesson->file_link.'/index.html') }}" style="width: 100%; height: 600px" frameborder="0"></iframe>
+                                        </div>
+                                    </div>
+                                </div>
                             @endforeach
                         </tbody>
                     </table>
@@ -255,7 +287,6 @@
                                 <option value="50">50</option>
                                 <option value="100">100</option>
                             </select>
-
                         </div>
                     </div>
                 </div>
@@ -268,7 +299,7 @@
     <script>
         const csrfToken = '{{ csrf_token() }}';
 
-        // Thành (sử dụng event delegation):
+        // Xử lý xóa bài giảng
         $(document).on('click', '.delete', function(e) {
             e.preventDefault();
             var selectedForm = $(this).closest('form');
@@ -285,28 +316,23 @@
             });
         });
 
-
-        // Khi thay đổi limit ở formLimit
+        // Xử lý thay đổi số dòng hiển thị
         $('#limit2').change(function() {
             const limitValue = $(this).val();
             $('#searchForm #limit').val(limitValue);
             $('#searchForm').submit();
         });
 
-        //Hàm xử lý bộ lọc
+        // Xử lý bộ lọc
         $('#searchForm').on('submit', function(e) {
-            e.preventDefault(); // Ngăn tải lại trang
-
+            e.preventDefault();
             $.ajax({
                 url: $(this).attr('action'),
                 type: 'GET',
                 data: $(this).serialize(),
                 success: function(response) {
-                    console.log(response.pagination);
                     $('#body-lessons').html(renderLessons(response.lessons.data));
-
-                    $('#paginationWrapper').html(response.pagination); // chèn HTML phân trang
-
+                    $('#paginationWrapper').html(response.pagination);
                 },
                 error: function(xhr) {
                     console.error('Lỗi khi tìm kiếm:', xhr.responseText);
@@ -317,51 +343,71 @@
         // Hàm tạo danh sách bài học
         function renderLessons(data) {
             if (data.length === 0)
-            return '<tr><td colspan="11" class="text-center"><div class="alert alert-warning">Không tìm thấy kết quả</div></td></tr>';
+                return '<tr><td colspan="11" class="text-center"><div class="alert alert-warning">Không tìm thấy kết quả</div></td></tr>';
 
             let html = '';
             data.forEach((lesson, index) => {
                 html += `
-            <tr>
-                <td>${index + 1}</td>
-                <td>${lesson.topic}</td>
-                <td>
-                    <strong>${lesson.lesson_name}</strong>
-                    <div class="text-muted mt-1">Nội dung: ${lesson.content}</div>
-                </td>
-                <td>${lesson.type}</td>
-                <td>${lesson.fee_type}</td>
-                <td>${lesson.file_type}</td>
-                <td>${lesson.duration}</td>
-                <td>${lesson.creator?.full_name || ''}</td>
-                <td>${formatDateTime(lesson.created_at)}</td>
-                <td>${formatDateTime(lesson.updated_at)}</td>
-                <td class="text-center">
-                    <div class="dropdown dropstart">
-                          <div class="border-0" type="button" data-bs-toggle="dropdown"
-                                                data-bs-display="static">
-                                                <i class="icon-settings fs-4"></i>
-                                            </div>
-                        <ul class="dropdown-menu">
-                            <li class="py-2">
-                                <a class="dropdown-item d-flex align-items-center gap-2 py-2 btn" href="/admin/lessons/edit/${lesson.id}">
-                                    <i class="icon-edit-3 text-primary"></i> Sửa
-                                </a>
-                            </li>
-                            <li class="py-2">
-                                <form action="/admin/lessons/delete/${lesson.id}" method="POST" class="delete-form">
-                                    <input type="hidden" name="_token" value="${csrfToken}">
-                                    <input type="hidden" name="_method" value="DELETE">
-                                    <button type="submit" class="delete dropdown-item d-flex align-items-center gap-2 text-danger btn">
-                                        <i class="icon-trash-2"></i> Xóa
-                                    </button>
-                                </form>
-                            </li>
-                        </ul>
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${lesson.topic}</td>
+                        <td>
+                            <strong>${lesson.lesson_name}</strong>
+                            <div class="text-muted mt-1">Nội dung: ${lesson.content}</div>
+                        </td>
+                        <td>${lesson.type}</td>
+                        <td>${lesson.fee_type}</td>
+                        <td>${lesson.file_type}</td>
+                        <td>${lesson.duration}</td>
+                        <td>${lesson.creator?.full_name || ''}</td>
+                        <td>${formatDateTime(lesson.created_at)}</td>
+                        <td>${formatDateTime(lesson.updated_at)}</td>
+                        <td class="text-center">
+                            <div class="dropdown dropstart">
+                                <div class="border-0" type="button" data-bs-toggle="dropdown" data-bs-display="static">
+                                    <i class="icon-settings fs-4"></i>
+                                </div>
+                                <ul class="dropdown-menu">
+                                    <li class="py-2">
+                                        <div class="dropdown-item d-flex align-items-center gap-2 py-2 btn" onclick="openModal('modal-${lesson.id}')">
+                                            <i class="icon-eye text-primary"></i> Xem
+                                        </div>
+                                    </li>
+                                    <li class="py-2">
+                                        <a class="dropdown-item d-flex align-items-center gap-2 py-2 btn" href="/admin/lessons/edit/${lesson.id}">
+                                            <i class="icon-edit-3 text-primary"></i> Sửa
+                                        </a>
+                                    </li>
+                                    <li class="py-2">
+                                        <form action="/admin/lessons/delete/${lesson.id}" method="POST" class="delete-form">
+                                            <input type="hidden" name="_token" value="${csrfToken}">
+                                            <input type="hidden" name="_method" value="DELETE">
+                                            <button type="submit" class="delete dropdown-item d-flex align-items-center gap-2 text-danger btn">
+                                                <i class="icon-trash-2"></i> Xóa
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                    <div id="modal-${lesson.id}" class="custom-modal">
+                        <div class="custom-modal-content">
+                            <span class="custom-close" onclick="closeModal('modal-${lesson.id}')">×</span>
+                            <div id="modalContent-${lesson.id}">
+                                ${lesson.file_type === 'video' ?
+                                    `<video controls style="width: 100%; height: 400px;">
+                                        <source src="${lesson.file_link}" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>` :
+                                    lesson.file_type === 'pdf' ?
+                                    `<iframe src="${lesson.file_link}" style="width: 100%; height: 400px;" frameborder="0"></iframe>` :
+                                    `<p>Loại tệp không được hỗ trợ: ${lesson.file_type}</p>`
+                                }
+                            </div>
+                        </div>
                     </div>
-                </td>
-            </tr>
-        `;
+                `;
             });
             return html;
         }
@@ -369,27 +415,22 @@
         // Hàm định dạng thời gian
         function formatDateTime(dateTime) {
             const date = new Date(dateTime);
-
             const hours = date.getHours().toString().padStart(2, '0');
             const minutes = date.getMinutes().toString().padStart(2, '0');
             const day = date.getDate().toString().padStart(2, '0');
-            const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Tháng bắt đầu từ 0
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
             const year = date.getFullYear();
-
             return `${hours}:${minutes} ${day}/${month}/${year}`;
         }
 
-
+        // Xử lý phân trang
         $(document).on('click', '#paginationWrapper a', function(e) {
-            e.preventDefault(); // Ngăn trang tải lại
-
-            const url = $(this).attr('href'); // Lấy URL phân trang (bao gồm các tham số lọc)
-
+            e.preventDefault();
+            const url = $(this).attr('href');
             $.ajax({
-                url: url, // Gọi URL phân trang
+                url: url,
                 type: 'GET',
                 success: function(response) {
-                    // Cập nhật kết quả bài học và phân trang
                     $('#body-lessons').html(renderLessons(response.lessons.data));
                     $('#paginationWrapper').html(response.pagination);
                 },
@@ -398,5 +439,30 @@
                 }
             });
         });
+
+        // Xử lý modal
+        function openModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.style.display = "block";
+            }
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.style.display = "none";
+            }
+        }
+
+        // Đóng modal khi click bên ngoài
+        window.onclick = function(event) {
+            const modals = document.getElementsByClassName('custom-modal');
+            for (let modal of modals) {
+                if (event.target === modal) {
+                    modal.style.display = "none";
+                }
+            }
+        }
     </script>
 @endpush

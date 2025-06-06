@@ -19,6 +19,7 @@ class Lesson extends Model
         'fee_type',
         'file_type',
         'duration',
+        'file_link',
         'created_by',
         'updated_by'
     ];

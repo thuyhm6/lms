@@ -15,120 +15,118 @@ use Illuminate\Validation\ValidationException;
 class ClassController extends Controller
 {
     public function index(Request $request)
-{
-    // Build the query
-    $query = Classes::select(
-        'classes.id AS sap_xep',
-        'classes.class_code AS ma_lop',
-        'classes.class_name AS ten_lop',
-        'classes.description AS mo_ta',
-        'classes.schedule AS lich_hoc',
-        DB::raw("COALESCE(t1.full_name, 'Chưa có') AS giao_vien_phu_trach_chinh"),
-        DB::raw("COALESCE(t2.notes, 'Chưa có') AS nhan_vien"),
-        'classes.learning_format AS hinh_thuc',
-        DB::raw("(SELECT COUNT(*) FROM attendance WHERE attendance.class_id = classes.id) AS so_buoi_hoc"),
-        DB::raw("(SELECT COUNT(DISTINCT attendance_detail.attendance_id) 
+    {
+        // Build the query
+        $query = Classes::select(
+            'classes.id AS sap_xep',
+            'classes.class_code AS ma_lop',
+            'classes.class_name AS ten_lop',
+            'classes.description AS mo_ta',
+            'classes.schedule AS lich_hoc',
+            DB::raw("COALESCE(t1.full_name, 'Chưa có') AS giao_vien_phu_trach_chinh"),
+            DB::raw("COALESCE(t2.notes, 'Chưa có') AS nhan_vien"),
+            'classes.learning_format AS hinh_thuc',
+            DB::raw("(SELECT COUNT(*) FROM attendance WHERE attendance.class_id = classes.id) AS so_buoi_hoc"),
+            DB::raw("(SELECT COUNT(DISTINCT attendance_detail.attendance_id) 
             FROM attendance_detail 
             JOIN attendance ON attendance_detail.attendance_id = attendance.id 
             WHERE attendance.class_id = classes.id) AS so_buoi_hoc_co_diem_danh"),
-        DB::raw("(SELECT COUNT(*) FROM student_classes 
+            DB::raw("(SELECT COUNT(*) FROM student_classes 
             WHERE student_classes.class_id = classes.id 
             AND student_classes.status = 'active') AS so_hoc_sinh"),
-        'classes.status AS trang_thai_lop_hoc',
-        'classes.created_at AS ngay_tao_lop_hoc',
-        'classes.active_days AS active_days'
-    )
-        ->leftJoin('schedules', 'classes.id', '=', 'schedules.class_id')
-        ->leftJoin('teachers AS t1', 'classes.teacher_id', '=', 't1.user_id')
-        ->leftJoin('students AS t2', 'schedules.assistant_teacher_id', '=', 't2.user_id');
+            'classes.status AS trang_thai_lop_hoc',
+            'classes.created_at AS ngay_tao_lop_hoc',
+            'classes.active_days AS active_days'
+        )
+            ->leftJoin('schedules', 'classes.id', '=', 'schedules.class_id')
+            ->leftJoin('teachers AS t1', 'classes.teacher_id', '=', 't1.user_id')
+            ->leftJoin('students AS t2', 'schedules.assistant_teacher_id', '=', 't2.user_id');
 
-    // Apply filters
-    if ($request->filled('keyword') && $request->filled('truong_tim_kiem')) {
-        $field = $request->truong_tim_kiem;
-        $keyword = $request->keyword;
-        if ($field === 'code') {
-            $query->where('classes.class_code', 'like', "%{$keyword}%");
-        } elseif ($field === 'name') {
-            $query->where('classes.class_name', 'like', "%{$keyword}%");
+        // Apply filters
+        if ($request->filled('keyword') && $request->filled('truong_tim_kiem')) {
+            $field = $request->truong_tim_kiem;
+            $keyword = $request->keyword;
+            if ($field === 'code') {
+                $query->where('classes.class_code', 'like', "%{$keyword}%");
+            } elseif ($field === 'name') {
+                $query->where('classes.class_name', 'like', "%{$keyword}%");
+            }
         }
-    }
 
-    if ($request->filled('giao_vien') && $request->giao_vien !== '') {
-        $query->where('classes.teacher_id', $request->giao_vien);
-    }
-
-    if ($request->filled('trang_thai') && $request->trang_thai !== '') {
-        $query->where('classes.status', $request->trang_thai);
-    }
-
-    if ($request->filled('hinh_thuc') && $request->hinh_thuc !== '') {
-        $query->where('classes.learning_format', $request->hinh_thuc);
-    }
-
-    // Group by necessary columns
-    $query->groupBy(
-        'classes.id',
-        'classes.class_code',
-        'classes.class_name',
-        'classes.learning_format',
-        'classes.status',
-        'classes.description',
-        'classes.created_at',
-        'classes.schedule',
-        't1.full_name',
-        't2.notes',
-        'classes.active_days'
-    );
-
-    // Number of items per page
-    $perPage = $request->input('per_page', 4);
-
-    // Paginate the results
-    $classes = $query->orderBy('classes.id')->paginate($perPage);
-
-    // Map the results to format the schedule
-    $classes->getCollection()->transform(function ($class) {
-        $schedule = json_decode($class->lich_hoc, true);
-        if (is_array($schedule) && !empty($schedule)) {
-            $dayMap = [
-                'thu-hai' => 'Thứ Hai',
-                'thu-ba' => 'Thứ Ba',
-                'thu-tu' => 'Thứ Tư',
-                'thu-nam' => 'Thứ Năm',
-                'thu-sau' => 'Thứ Sáu',
-                'thu-bay' => 'Thứ Bảy',
-                'chu-nhat' => 'Chủ Nhật',
-            ];
-            $formattedSchedule = array_map(function ($day) use ($dayMap) {
-                return $dayMap[$day] ?? $day;
-            }, $schedule);
-            $class->lich_hoc = implode(', ', $formattedSchedule);
-        } else {
-            $class->lich_hoc = 'Chưa có lịch học';
+        if ($request->filled('giao_vien') && $request->giao_vien !== '') {
+            $query->where('classes.teacher_id', $request->giao_vien);
         }
-        return $class;
-    });
 
-    // Data for filters
-    $teachers = Teacher::join('users', 'teachers.user_id', '=', 'users.id')
-        ->select('teachers.user_id', 'users.full_name')
-        ->orderBy('users.full_name')
-        ->get();
-    $statuses = ['1' => 'Đang học', '0' => 'Kết thúc'];
-    $learningFormats = ['online' => 'Online', 'offline' => 'Offline'];
-    $searchFields = ['code' => 'Mã lớp', 'name' => 'Tên lớp'];
+        if ($request->filled('trang_thai') && $request->trang_thai !== '') {
+            $query->where('classes.status', $request->trang_thai);
+        }
 
-    // Modified to handle AJAX request by returning just the HTML content that needs to be updated
-    if ($request->ajax()) {
+        if ($request->filled('hinh_thuc') && $request->hinh_thuc !== '') {
+            $query->where('classes.learning_format', $request->hinh_thuc);
+        }
+
+        // Group by necessary columns
+        $query->groupBy(
+            'classes.id',
+            'classes.class_code',
+            'classes.class_name',
+            'classes.learning_format',
+            'classes.status',
+            'classes.description',
+            'classes.created_at',
+            'classes.schedule',
+            't1.full_name',
+            't2.notes',
+            'classes.active_days'
+        );
+
+        // Number of items per page
+        $perPage = $request->input('per_page', 4);
+
+        // Paginate the results
+        $classes = $query->orderBy('classes.id')->paginate($perPage);
+
+        // Map the results to format the schedule
+        $classes->getCollection()->transform(function ($class) {
+            $schedule = json_decode($class->lich_hoc, true);
+            if (is_array($schedule) && !empty($schedule)) {
+                $dayMap = [
+                    'thu-hai' => 'Thứ Hai',
+                    'thu-ba' => 'Thứ Ba',
+                    'thu-tu' => 'Thứ Tư',
+                    'thu-nam' => 'Thứ Năm',
+                    'thu-sau' => 'Thứ Sáu',
+                    'thu-bay' => 'Thứ Bảy',
+                    'chu-nhat' => 'Chủ Nhật',
+                ];
+                $formattedSchedule = array_map(function ($day) use ($dayMap) {
+                    return $dayMap[$day] ?? $day;
+                }, $schedule);
+                $class->lich_hoc = implode(', ', $formattedSchedule);
+            } else {
+                $class->lich_hoc = 'Chưa có lịch học';
+            }
+            return $class;
+        });
+
+        // Data for filters
+        $teachers = Teacher::join('users', 'teachers.user_id', '=', 'users.id')
+            ->select('teachers.user_id', 'users.full_name')
+            ->orderBy('users.full_name')
+            ->get();
+        $statuses = ['1' => 'Đang học', '0' => 'Kết thúc'];
+        $learningFormats = ['online' => 'Online', 'offline' => 'Offline'];
+        $searchFields = ['code' => 'Mã lớp', 'name' => 'Tên lớp'];
+
+        // Modified to handle AJAX request by returning just the HTML content that needs to be updated
+        if ($request->ajax()) {
+            return view('class.index', compact('classes', 'teachers', 'statuses', 'learningFormats', 'searchFields'));
+        }
+
         return view('class.index', compact('classes', 'teachers', 'statuses', 'learningFormats', 'searchFields'));
     }
 
-    return view('class.index', compact('classes', 'teachers', 'statuses', 'learningFormats', 'searchFields'));
-}
-
-    public function addStudents() {
-        
-    }
+    public function addStudents() {}
     public function create()
     {
         // Lấy danh sách giáo viên (type = TEACHER)
@@ -233,8 +231,8 @@ class ClassController extends Controller
             'classes.learning_format AS hinh_thuc',
             DB::raw("COALESCE(t1.full_name, 'Chưa có') AS giao_vien_phu_trach_chinh"),
             DB::raw("(SELECT COUNT(*) FROM student_classes 
-                WHERE student_classes.class_id = classes.id 
-                AND student_classes.status = 'active') AS so_hoc_sinh"),
+            WHERE student_classes.class_id = classes.id 
+            AND student_classes.status = 'active') AS so_hoc_sinh"),
             'classes.active_days AS active_days',
             DB::raw("DATE_ADD(classes.created_at, INTERVAL classes.active_days DAY) AS ngay_ket_thuc"),
             'classes.status AS trang_thai_lop_hoc',
@@ -248,24 +246,54 @@ class ClassController extends Controller
             abort(404, 'Lớp học không tồn tại');
         }
 
-        // Lấy lịch học của lớp, cùng với thông tin khóa học
+        // Lấy lịch học của lớp, cùng với thông tin bài học, môn học và khóa học từ schedule_lesson
         $schedules = DB::table('schedules')
             ->select(
+                'schedules.id AS schedule_id',
                 'schedules.start_date',
                 'schedules.start_time',
                 'schedules.end_time',
-                DB::raw("COALESCE(t2.notes, 'Chưa có') AS tro_giang"),
-                'courses.id AS course_id',
-                'courses.course_name AS ten_khoa_hoc'
+                'schedules.teacher_id AS giao_vien_id',
+                DB::raw("COALESCE(u2.full_name, 'Chưa có') AS giao_vien"),
+                'schedules.notes AS ghi_chu',
+                DB::raw("GROUP_CONCAT(DISTINCT lessons.lesson_name SEPARATOR ', ') AS ten_bai_hoc"),
+                DB::raw("GROUP_CONCAT(DISTINCT subjects.subject_name SEPARATOR ', ') AS ten_mon_hoc"),
+                DB::raw("GROUP_CONCAT(DISTINCT courses.course_name SEPARATOR ', ') AS ten_khoa_hoc")
             )
-            ->leftJoin('students AS t2', 'schedules.assistant_teacher_id', '=', 't2.user_id')
-            ->leftJoin('courses', 'schedules.course_id', '=', 'courses.id') // Join với courses qua schedules
+            ->leftJoin('users AS u2', 'schedules.teacher_id', '=', 'u2.id')
+            ->leftJoin('schedule_lessons', 'schedules.id', '=', 'schedule_lessons.schedule_id')
+            ->leftJoin('lessons', 'schedule_lessons.lesson_id', '=', 'lessons.id')
+            ->leftJoin('subjects', 'lessons.subject_id', '=', 'subjects.id')
+            ->leftJoin('courses', 'subjects.course_id', '=', 'courses.id')
             ->where('schedules.class_id', $id)
+            ->groupBy(
+                'schedules.id',
+                'schedules.start_date',
+                'schedules.start_time',
+                'schedules.end_time',
+                'schedules.teacher_id',
+                'u2.full_name',
+                'schedules.notes'
+            )
             ->orderBy('schedules.start_date')
             ->get();
 
-        // Lấy danh sách khóa học duy nhất từ lịch học
-        $courseIds = $schedules->pluck('course_id')->unique()->filter();
+        // Lấy danh sách giáo viên
+        $teachers = DB::table('teachers')
+            ->select('teachers.user_id', 'users.full_name AS ten_giao_vien', 'teachers.teacher_code')
+            ->join('users', 'teachers.user_id', '=', 'users.id')
+            ->where('users.utype', 'TEACHER')
+            ->get();
+
+        // Lấy danh sách khóa học duy nhất từ schedule_lessons
+        $courseIds = DB::table('schedule_lessons')
+            ->join('lessons', 'schedule_lessons.lesson_id', '=', 'lessons.id')
+            ->join('subjects', 'lessons.subject_id', '=', 'subjects.id')
+            ->join('schedules', 'schedule_lessons.schedule_id', '=', 'schedules.id')
+            ->where('schedules.class_id', $id)
+            ->pluck('subjects.course_id')
+            ->unique()
+            ->filter();
 
         // Lấy danh sách môn học (subjects) cho tất cả các khóa học liên quan
         $subjects = DB::table('subjects')
@@ -294,7 +322,8 @@ class ClassController extends Controller
         // Nhóm subjects theo course_id để hiển thị
         $subjectsByCourse = $subjectsWithLessons->groupBy('course_id');
 
-        return view('class.schedule', compact('class', 'schedules', 'subjectsByCourse'));
+
+        return view('class.schedule', compact('class', 'schedules', 'subjectsByCourse', 'teachers'));
     }
 
     public function showStudents($id)
@@ -338,7 +367,7 @@ class ClassController extends Controller
             ->orderBy('student_classes.id')
             ->get();
 
-            // dd($class);
+        // dd($class);
         return view('class.students', compact('class', 'students'));
     }
 
@@ -532,27 +561,34 @@ class ClassController extends Controller
                 'endTime' => 'required|date_format:H:i|after:startTime',
                 'teacher_id' => 'required|integer|exists:teachers,user_id',
                 'assistant_teacher_id' => 'nullable|integer|exists:teachers,user_id', // Cho phép null
-                'subject_id' => 'required|integer|exists:subjects,id',
+                // 'subject_id' => 'required|integer|exists:subjects,id',
                 'lesson_ids' => 'required|array',
                 'lesson_ids.*' => 'integer|exists:lessons,id',
-                 'note' => 'nullable|string|max:255',
-                 'course_id' => 'required|integer|exists:courses,id' // Thêm validate cho course_id
+                'note' => 'nullable|string|max:255',
+                //  'course_id' => 'required|integer|exists:courses,id' // Thêm validate cho course_id
             ]);
             // Ghi log dữ liệu đã xác thực
             Log::info('Validated data:', $data);
 
             // Kiểm tra xem lesson_ids có thuộc subject_id không
-            $invalidLessons = DB::table('lessons')
-                ->whereIn('id', $data['lesson_ids'])
-                ->where('subject_id', '!=', $data['subject_id'])
-                ->pluck('id')
+            // $invalidLessons = DB::table('lessons')
+            //     ->whereIn('id', $data['lesson_ids'])
+            //     ->where('subject_id', '!=', $data['subject_id'])
+            //     ->pluck('id')
+            //     ->toArray();
+
+            // if (!empty($invalidLessons)) {
+            //     throw ValidationException::withMessages([
+            //         'lesson_ids' => ['Các bài học không hợp lệ: ' . implode(', ', $invalidLessons) . ' không thuộc chủ đề đã chọn.']
+            //     ]);
+            // }
+
+            // Lấy danh sách student_user_id của lớp học
+            $studentUserIds = DB::table('student_classes')
+                ->where('class_id', $data['classId'])
+                ->pluck('student_id')
                 ->toArray();
 
-            if (!empty($invalidLessons)) {
-                throw ValidationException::withMessages([
-                    'lesson_ids' => ['Các bài học không hợp lệ: ' . implode(', ', $invalidLessons) . ' không thuộc chủ đề đã chọn.']
-                ]);
-            }
             // Cập nhật teacher_id cho lớp học
             $class = Classes::findOrFail($data['classId']);
             $class->teacher_id = $data['teacher_id'];
@@ -571,28 +607,78 @@ class ClassController extends Controller
                     ->update([
                         'teacher_id' => $data['teacher_id'],
                         'assistant_teacher_id' => $data['assistant_teacher_id'],
-                        'subject_id' => $data['subject_id'],
-                        'course_id' => $data['course_id'], // Lưu course_id
+                        // 'lesson_id' => $data['lesson_ids'],
+                        // 'subject_id' => $data['subject_id'],
+                        // 'course_id' => $data['course_id'], // Lưu course_id
                         'end_time' => $data['endTime'],
                         'notes' => $data['note'],
                         'updated_at' => now()
                     ]);
+                //
+                $scheduleId = $schedule->id;
+
+                // Xóa các bản ghi chi tiết cũ trong schedule_lessons
+                DB::table('schedule_lessons')
+                    ->where('schedule_id', $schedule->id)
+                    ->delete();
+
+                // Thêm các bản ghi chi tiết mới vào schedule_lessons
+                $scheduleDetails = array_map(function ($lessonId) use ($schedule) {
+                    return [
+                        'schedule_id' => $schedule->id,
+                        'lesson_id' => $lessonId,
+                        'created_at' => now(),
+                        'updated_at' => now()
+                    ];
+                }, $data['lesson_ids']);
+
+                DB::table('schedule_lessons')->insert($scheduleDetails);
+
+                // Xóa các bản ghi điểm danh cũ cho lịch học này
+                DB::table('schedule_detail')
+                    ->where('schedule_id', $scheduleId)
+                    ->delete();
             } else {
                 // Tạo bản ghi lịch học mới
-                DB::table('schedules')->insert([
+                $scheduleId = DB::table('schedules')->insertGetId([
                     'class_id' => $data['classId'],
                     'start_date' => $data['scheduleDate'],
                     'start_time' => $data['startTime'],
                     'end_time' => $data['endTime'],
                     'teacher_id' => $data['teacher_id'],
                     'assistant_teacher_id' => $data['assistant_teacher_id'],
-                    'subject_id' => $data['subject_id'],
-                    'course_id' => $data['course_id'], // Lưu course_id
                     'notes' => $data['note'],
                     'created_at' => now(),
                     'updated_at' => now()
                 ]);
+
+                // Thêm các bản ghi chi tiết vào schedule_lessons
+                $scheduleDetails = array_map(function ($lessonId) use ($scheduleId) {
+                    return [
+                        'schedule_id' => $scheduleId,
+                        'lesson_id' => $lessonId,
+                        'created_at' => now(),
+                        'updated_at' => now()
+                    ];
+                }, $data['lesson_ids']);
+
+                DB::table('schedule_lessons')->insert($scheduleDetails);
             }
+
+            // Thêm bản ghi vào schedule_detail cho mỗi học sinh
+            $schedulesDetail = array_map(function ($studentUserId) use ($scheduleId, $data) {
+                return [
+                    'schedule_id' => $scheduleId,
+                    'student_id' => $studentUserId,
+                    'attendance_date' => $data['scheduleDate'],
+                    'attendance_status' => 1,
+                    'created_at' => now(),
+                    'updated_at' => now()
+                    // Bạn có thể thêm các trường mặc định khác như 'attendance_status' nếu cần
+                ];
+            }, $studentUserIds);
+
+            DB::table('schedule_detail')->insert($schedulesDetail);
 
             // Ghi log
             Log::info('Saved schedule for class', [
@@ -602,9 +688,10 @@ class ClassController extends Controller
                 'end_time' => $data['endTime'],
                 'teacher_id' => $data['teacher_id'],
                 'assistant_teacher_id' => $data['assistant_teacher_id'],
-                'subject_id' => $data['subject_id'],
                 'lesson_ids' => $data['lesson_ids'],
-                'note' => $data['note']
+                'note' => $data['note'],
+                'schedule_id' => $scheduleId, // Log luôn schedule_id
+                'student_count' => count($studentUserIds) // Log số lượng học sinh được thêm vào schedule_detail
             ]);
 
             return response()->json([

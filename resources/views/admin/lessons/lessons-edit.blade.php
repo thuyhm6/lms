@@ -63,7 +63,7 @@
 
                         <fieldset class="my-3 col-lg-6 col-md-12 p-3">
                             <label class="body-title mb-4">Mô tả nội dung <span class="tf-color-1">*</span></label>
-                            <input type="text" name="content" value="{{ old('content') }}">
+                            <input type="text" name="content" value="{{ old('content', $lesson->content) }}">
                             @error('content')
                                 <p class="text-danger">{{ $message }}</p>
                             @enderror
@@ -129,6 +129,14 @@
                             <input type="time" name="duration"
                                 value="{{ old('duration', $lesson->duration ?? '01:30:00') }}">
                             @error('duration')
+                                <p class="text-danger">{{ $message }}</p>
+                            @enderror
+                        </fieldset>
+
+                        <fieldset class="my-3 col-lg-6 col-md-12 p-3">
+                            <label class="body-title mb-4">File bài giảng</label>
+                            <input type="file" name="file_link">
+                            @error('file_link')
                                 <p class="text-danger">{{ $message }}</p>
                             @enderror
                         </fieldset>

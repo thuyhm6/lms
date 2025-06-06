@@ -6,28 +6,37 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
+use App\Constants\UserRole;
 
 class AuthAdmin
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     */
     public function handle(Request $request, Closure $next): Response
     {
-        //Cần check chỗ này
-        if(Auth::check()){
-            if(Auth::user()->utype === 'ADM') {
-                return $next($request);
-            } else {
-                session()->flush();
-                return redirect()->route('login');
-            }
-        } else {
-            session()->flush();
+        if (!Auth::check()) {
             return redirect()->route('login');
         }
+
+        $userRole = Auth::user()->utype;
         
+        if (in_array($userRole, UserRole::getAdminRoles())) {
+            return $next($request);
+        }
+
+        // Chuyển hướng dựa trên role
+        return $this->redirectToUserDashboard($userRole);
+    }
+
+    private function redirectToUserDashboard($role)
+    {
+        switch ($role) {
+            case UserRole::TEACHER:
+                return redirect()->route('user.index');
+            case UserRole::STUDENT:
+                return redirect()->route('user.index');
+            case UserRole::PARENT:
+                return redirect()->route('user.index');
+            default:
+                return redirect()->route('login');
+        }
     }
 }

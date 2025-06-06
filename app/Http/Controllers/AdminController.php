@@ -11,19 +11,24 @@ use App\Models\OrderItem;
 use App\Models\Transaction;
 use App\Models\Slide;
 use App\Models\Contact;
+use App\Models\ParentAppointment;
 use App\Models\ParentModel;
-use App\Models\Parents;
 use App\Models\Student;
 use App\Models\Subject;
+use App\Models\SuccessfulAppointment;
 use App\Models\Teacher;
 use App\Models\User;
 use Carbon\Carbon;
+use Exception;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Laravel\Facades\Image;
 
@@ -262,7 +267,10 @@ class AdminController extends Controller
 
    //Parents
     public function parents() {
-        $parents = ParentModel::with('user')->orderBy('user_id', 'DESC')->paginate(10);
+        $parents = ParentModel::join('users', 'parents.user_id', '=', 'users.id')
+            ->select('parents.*', 'users.full_name', 'users.email')
+            ->orderBy('user_id', 'DESC')
+            ->paginate(6);
 
         // Load tất cả subjects để map với ID
         $allSubjects = Subject::pluck('subject_name', 'id')->toArray();
@@ -279,87 +287,92 @@ class AdminController extends Controller
                 $statuses[] = trim($value, "'");
             }
         }
-
+// Query the database to get total counts for each status
+            $totalStats = ParentModel::select('status', DB::raw('count(*) as count'))
+                ->groupBy('status')
+                ->get()
+                ->pluck('count', 'status')
+                ->all();
         $learning_formats = ParentModel::select('learning_format')->distinct()->get();
 
-        return view('admin.parents', compact('parents', 'statuses', 'learning_formats', 'allSubjects'));
+        return view('admin.parents.parents', compact('parents', 'statuses', 'learning_formats', 'allSubjects', 'totalStats'));
     }
 
 
     public function addParent() {
         $subjects = Subject::select('id','subject_name')->orderBy('id')->get();
         // dd($subjects);
-        return view('admin.parent-add', compact('subjects'));
+        return view('admin.parents.parent-add', compact('subjects'));
     }
 
-   public function storeParent(Request $request)
-{
-    // Validate dữ liệu
-    $request->validate([
-        'full_name' => 'required|string|max:255',
-        'email' => 'required|email|unique:users,email',
-        'mobile' => 'required|string|max:20',
-        'address' => 'required|string',
-        'school' => 'required|string',
-        'grade' => 'required|string',
-        'status' => 'required|string',
-        'learning_format' => 'required|string',
-        'subjects' => 'required|array|min:1',
-        'subjects.*' => 'exists:subjects,id',
-        'marketing_source' => 'required|string',
-        'notes' => 'required|string',
-        'image' => 'nullable|image|max:2048',
-    ]);
+    public function storeParent(Request $request)
+    {
+        // Validate dữ liệu
+        $request->validate([
+            'full_name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'mobile' => 'required|string|max:20',
+            'address' => 'required|string',
+            'school' => 'required|string',
+            'grade' => 'required|string',
+            'status' => 'required|string',
+            'learning_format' => 'required|string',
+            'subjects' => 'required|array|min:1',
+            'subjects.*' => 'exists:subjects,id',
+            'marketing_source' => 'required|string',
+            'notes' => 'required|string',
+            'image' => 'nullable|image|max:2048',
+        ]);
 
-    DB::beginTransaction();
+        DB::beginTransaction();
 
-    try {
-        // 1. Tạo user mới
-        $user = new User();
-        $user->full_name = $request->full_name;
-        $user->email = $request->email;
-        $user->mobile = $request->mobile;
-        $user->password = bcrypt('123456');
-        $user->utype = 'PARENT';
-        $user->address = $request->address;
+        try {
+            // 1. Tạo user mới
+            $user = new User();
+            $user->full_name = $request->full_name;
+            $user->email = $request->email;
+            $user->mobile = $request->mobile;
+            $user->password = bcrypt('123456');
+            $user->utype = 'PARENT';
+            $user->address = $request->address;
 
-        if ($request->hasFile('image')) {
-            $destinationPath = public_path('uploads/avatars');
-            if (!File::exists($destinationPath)) {
-                File::makeDirectory($destinationPath, 0755, true);
+            if ($request->hasFile('image')) {
+                $destinationPath = public_path('uploads/avatars');
+                if (!File::exists($destinationPath)) {
+                    File::makeDirectory($destinationPath, 0755, true);
+                }
+                $image = $request->file('image');
+                $fileName = time() . '.' . $image->extension();
+                $image->move($destinationPath, $fileName);
+                $user->image = $fileName;
+            } else {
+                $user->image = 'default.png';
             }
-            $image = $request->file('image');
-            $fileName = time() . '.' . $image->extension();
-            $image->move($destinationPath, $fileName);
-            $user->image = $fileName;
-        } else {
-            $user->image = 'default.png';
+            $user->save();
+
+            // 2. Tạo parent record
+            $parent = new ParentModel();
+            $parent->user_id = $user->id;
+            $parent->status = $request->status;
+            $parent->learning_format = $request->learning_format;
+            $parent->school = $request->school;
+            $parent->grade = $request->grade;
+            $parent->subjects = json_encode($request->subjects);
+            $parent->marketing_source = $request->marketing_source;
+            $parent->notes = $request->notes;
+            $parent->save();
+
+            DB::commit();
+
+            return redirect()->route('admin.parents')
+                ->with('success', 'Thêm phụ huynh thành công!');
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::error($e->getMessage());
+            return back()->with('error', 'Đã xảy ra lỗi: ' . $e->getMessage())
+                ->withInput();
         }
-        $user->save();
-
-        // 2. Tạo parent record
-        $parent = new ParentModel();
-        $parent->user_id = $user->id;
-        $parent->status = $request->status;
-        $parent->learning_format = $request->learning_format;
-        $parent->school = $request->school;
-        $parent->grade = $request->grade;
-        $parent->subjects = json_encode($request->subjects);
-        $parent->marketing_source = $request->marketing_source;
-        $parent->notes = $request->notes;
-        $parent->save();
-
-        DB::commit();
-
-        return redirect()->route('admin.parents')
-            ->with('success', 'Thêm phụ huynh thành công!');
-    } catch (\Exception $e) {
-        DB::rollBack();
-        \Log::error($e->getMessage());
-        return back()->with('error', 'Đã xảy ra lỗi: ' . $e->getMessage())
-            ->withInput();
     }
-}
 
     public function editParent($id)
     {
@@ -383,98 +396,96 @@ class AdminController extends Controller
         $subjects = Subject::select('id', 'subject_name')->orderBy('id')->get();
         $selectedSubjects = json_decode($parent->subjects, true) ?? [];
 
-    // Lấy danh sách trạng thái từ cột enum
-    $column = DB::select("SHOW COLUMNS FROM parents WHERE Field = 'status'");
-    $type = $column[0]->Type;
-    preg_match("/^enum\((.*)\)$/", $type, $matches);
-    $statuses = [];
-    if (!empty($matches)) {
-        $values = explode(",", $matches[1]);
-        foreach ($values as $value) {
-            $statuses[] = trim($value, "'");
+        // Lấy danh sách trạng thái từ cột enum
+        $column = DB::select("SHOW COLUMNS FROM parents WHERE Field = 'status'");
+        $type = $column[0]->Type;
+        preg_match("/^enum\((.*)\)$/", $type, $matches);
+        $statuses = [];
+        if (!empty($matches)) {
+            $values = explode(",", $matches[1]);
+            foreach ($values as $value) {
+                $statuses[] = trim($value, "'");
+            }
         }
-    }
 
-    // Lấy danh sách learning_format duy nhất
-    $learning_formats = ParentModel::select('learning_format')->distinct()->pluck('learning_format');
+        // Lấy danh sách learning_format duy nhất
+        $learning_formats = ParentModel::select('learning_format')->distinct()->pluck('learning_format');
 
         // Truyền dữ liệu vào view
-        return view('admin.parent-edit', compact('parent', 'subjects', 'selectedSubjects', 'statuses', 'learning_formats'));
+        return view('admin.parents.parent-edit', compact('parent', 'subjects', 'selectedSubjects', 'statuses', 'learning_formats'));
     }
 
-    /**
-     * Update the specified parent in storage.
-     */
+   
     public function updateParent(Request $request, $id)
     {
         $parent = ParentModel::where('user_id', $id)->firstOrFail();
-    $user = User::findOrFail($id);
+        $user = User::findOrFail($id);
 
-    $request->validate([
-        'full_name' => 'required|string|max:255',
-        'email' => 'required|email|unique:users,email,' . $user->id,
-        'mobile' => 'required|string|max:20',
-        'address' => 'required|string|max:255',
-        'school' => 'required|string|max:255',
-        'grade' => 'required|string|max:50',
-        'status' => 'required|in:pending,interested,exploring,doubtful,rejected,completed,reserved,inactive',
-        'learning_format' => 'required|in:online,offline',
-        'subjects' => 'required|array|min:1',
-        'subjects.*' => 'integer|exists:subjects,id',
-        'marketing_source' => 'required|in:none,ads_content,consultant,class_management,workshop,sales_marketing,teacher',
-        'notes' => 'required|string',
-        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-    ]);
+        $request->validate([
+            'full_name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'mobile' => 'required|string|max:20',
+            'address' => 'required|string|max:255',
+            'school' => 'required|string|max:255',
+            'grade' => 'required|string|max:50',
+            'status' => 'required|in:pending,interested,exploring,doubtful,rejected,completed,reserved,inactive',
+            'learning_format' => 'required|in:online,offline',
+            'subjects' => 'required|array|min:1',
+            'subjects.*' => 'integer|exists:subjects,id',
+            'marketing_source' => 'required|in:none,ads_content,consultant,class_management,workshop,sales_marketing,teacher',
+            'notes' => 'required|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
 
-    DB::beginTransaction();
+        DB::beginTransaction();
 
-    try {
-        // Update user data
-        $user->full_name = $request->full_name;
-        $user->email = $request->email;
-        $user->mobile = $request->mobile;
-        $user->address = $request->address;
+        try {
+            // Update user data
+            $user->full_name = $request->full_name;
+            $user->email = $request->email;
+            $user->mobile = $request->mobile;
+            $user->address = $request->address;
 
-        // Handle image upload
-        if ($request->hasFile('image')) {
-            if ($user->image && $user->image !== 'default.png') {
-                $oldImagePath = public_path('uploads/avatars/' . $user->image);
-                if (File::exists($oldImagePath)) {
-                    File::delete($oldImagePath);
+            // Handle image upload
+            if ($request->hasFile('image')) {
+                if ($user->image && $user->image !== 'default.png') {
+                    $oldImagePath = public_path('uploads/avatars/' . $user->image);
+                    if (File::exists($oldImagePath)) {
+                        File::delete($oldImagePath);
+                    }
                 }
+                $destinationPath = public_path('uploads/avatars');
+                if (!File::exists($destinationPath)) {
+                    File::makeDirectory($destinationPath, 0755, true);
+                }
+                $image = $request->file('image');
+                $fileName = time() . '.' . $image->getClientOriginalExtension();
+                $image->move($destinationPath, $fileName);
+                $user->image = $fileName;
             }
-            $destinationPath = public_path('uploads/avatars');
-            if (!File::exists($destinationPath)) {
-                File::makeDirectory($destinationPath, 0755, true);
-            }
-            $image = $request->file('image');
-            $fileName = time() . '.' . $image->getClientOriginalExtension();
-            $image->move($destinationPath, $fileName);
-            $user->image = $fileName;
+
+            $user->save();
+
+            // Update parent data
+            $parent->status = $request->status;
+            $parent->learning_format = $request->learning_format;
+            $parent->school = $request->school;
+            $parent->grade = $request->grade;
+            $parent->subjects = json_encode($request->subjects); // Store as JSON array
+            $parent->marketing_source = $request->marketing_source;
+            $parent->notes = $request->notes;
+            $parent->save();
+
+            DB::commit();
+
+            return redirect()->route('admin.parents')
+                ->with('success', 'Cập nhật phụ huynh thành công!');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error updating parent: ' . $e->getMessage());
+            return back()->with('error', 'Đã xảy ra lỗi khi cập nhật phụ huynh. Vui lòng thử lại.')
+                ->withInput();
         }
-
-        $user->save();
-
-        // Update parent data
-        $parent->status = $request->status;
-        $parent->learning_format = $request->learning_format;
-        $parent->school = $request->school;
-        $parent->grade = $request->grade;
-        $parent->subjects = json_encode($request->subjects); // Store as JSON array
-        $parent->marketing_source = $request->marketing_source;
-        $parent->notes = $request->notes;
-        $parent->save();
-
-        DB::commit();
-
-        return redirect()->route('admin.parents')
-            ->with('success', 'Cập nhật phụ huynh thành công!');
-    } catch (\Exception $e) {
-        DB::rollBack();
-        \Log::error('Error updating parent: ' . $e->getMessage());
-        return back()->with('error', 'Đã xảy ra lỗi khi cập nhật phụ huynh. Vui lòng thử lại.')
-            ->withInput();
-    }
 
 
     }
@@ -532,7 +543,7 @@ class AdminController extends Controller
     public function viewParent($id)
     {
         // Debug: Kiểm tra ID đầu vào
-        \Log::info('viewParent called with ID: ' . $id);
+        Log::info('viewParent called with ID: ' . $id);
 
         $parent = DB::table('parents')
         ->join('users', 'parents.user_id', '=', 'users.id')
@@ -549,85 +560,323 @@ class AdminController extends Controller
         ->first();
         // dd($parent);
         if (!$parent) {
-            \Log::error('Parent not found for user_id: ' . $id);
+            Log::error('Parent not found for user_id: ' . $id);
             return redirect()->route('admin.parents')->with('error', 'Không tìm thấy phụ huynh.');
         }
 
        $allSubjects = Subject::pluck('subject_name', 'id')->toArray();
 
-    // Giải mã subjects từ JSON và ánh xạ sang tên môn học
-    $subjects = json_decode($parent->subjects, true) ?? [];
-    $subjectNames = array_map(function ($subjectId) use ($allSubjects) {
-        return $allSubjects[$subjectId] ?? 'N/A';
-    }, $subjects);
+        // Giải mã subjects từ JSON và ánh xạ sang tên môn học
+        $subjects = json_decode($parent->subjects, true) ?? [];
+        $subjectNames = array_map(function ($subjectId) use ($allSubjects) {
+            return $allSubjects[$subjectId] ?? 'N/A';
+        }, $subjects);
 
-    return view('admin.parent-view', [
-        'parent' => $parent,
-        'subjects' => $subjectNames,
-        'allSubjects' => $allSubjects
-    ]);
+        return view('admin.parents.parent-view', [
+            'parent' => $parent,
+            'subjects' => $subjectNames,
+            'allSubjects' => $allSubjects
+        ]);
     }
 
 
 
     public function filterParents(Request $request)
+{
+    $query = ParentModel::query();
+
+    // Keyword filter
+    if ($request->filled('keyword')) {
+        $query->whereHas('user', function ($q) use ($request) {
+            $q->where('full_name', 'like', '%' . $request->keyword . '%')
+              ->orWhere('email', 'like', '%' . $request->keyword . '%')
+              ->orWhere('mobile', 'like', '%' . $request->keyword . '%');
+        });
+    }
+
+    // Marketing source filter
+    if ($request->filled('marketing_source')) {
+        $query->where('marketing_source', $request->marketing_source);
+    }
+
+    // Learning format filter
+    if ($request->filled('learning_format')) {
+        $query->where('learning_format', $request->learning_format);
+    }
+
+    // Status filter with contact_date_filter for contact_again and appointment_success
+    if ($request->filled('status')) {
+        $status = $request->status;
+
+        if (in_array($status, ['contact_again', 'appointment_success']) && $request->filled('contact_date_filter')) {
+            $contactDate = $request->contact_date_filter;
+            $query->where('status', $status)
+                  ->whereHas('appointments', function ($q) use ($contactDate) {
+                      $q->whereDate('contact_date', $contactDate);
+                  });
+        } else {
+            $query->where('status', $status);
+        }
+    }
+
+    // Date range filter for created_at
+    if ($request->filled('from_date')) {
+        $query->whereDate('created_at', '>=', $request->from_date);
+    }
+    if ($request->filled('to_date')) {
+        $query->whereDate('created_at', '<=', $request->to_date);
+    }
+
+    // Rows per page
+    $perPage = $request->input('per_page', 4);
+
+    // Get paginated results
+    $parents = $query->join('users', 'parents.user_id', '=', 'users.id')
+        ->with(['user', 'appointments'])
+        ->paginate($perPage);
+    // dd($parents);
+    // Additional data
+    $allSubjects = Subject::pluck('subject_name', 'id')->toArray();
+    $statuses = ['pending', 'contacted', 'doubtful', 'completed', 'interested', 'exploring', 'inactive', 'reserved', 'rejected', 'contact_again', 'appointment_success'];
+
+    return view('admin.parents.parents', compact('parents', 'allSubjects', 'statuses'));
+}
+
+
+    public function createAppointment(Request $request)
     {
-        // Example query with filters
-        $query = ParentModel::query();
+        try {
+            $request->validate([
+                'parent_id' => 'required|exists:parents,user_id',
+                'title' => 'required|string|max:255',
+                'content' => 'required|string',
+                'status' => 'required|in:contact_again,appointment_success',
+                 'contact_date' => 'nullable|date_format:Y-m-d H:i:s', // Validate as DATETIME
+            ]);
 
-        // Keyword filter
-        if ($request->filled('keyword')) {
-            $query->whereHas('user', function ($q) use ($request) {
-                $q->where('full_name', 'like', '%' . $request->keyword . '%')
-                  ->orWhere('email', 'like', '%' . $request->keyword . '%')
-                  ->orWhere('mobile', 'like', '%' . $request->keyword . '%');
+            // Create the appointment
+            $appointment = ParentAppointment::create([
+                'parent_id' => $request->parent_id,
+                'title' => $request->title,
+                'content' => $request->content,
+                'status' => $request->status,
+                'contact_date' => $request->contact_date,
+            ]);
+
+            // Update the parent's status
+            ParentModel::where('user_id', $request->parent_id)->update([
+                'status' => $request->status,
+            ]);
+
+            return response()->json(['message' => 'Appointment created and parent status updated successfully'], 200);
+        } catch (\Exception $e) {
+            Log::error('Error creating appointment: ' . $e->getMessage(), [
+                'request' => $request->all(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json([
+                'message' => 'Error creating appointment: ' . $e->getMessage(),
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+      public function getAppointments(Request $request)
+    {
+        try {
+            $request->validate([
+                'parent_id' => 'required|exists:parents,user_id',
+            ]);
+
+            Log::info('Fetching appointments for parent_id: ' . $request->parent_id);
+
+            $appointments = ParentAppointment::where('parent_id', $request->parent_id)->get();
+            $statusLabels = [
+                'pending' => 'Đang chờ',
+                'contacted' => 'Đã liên hệ',
+                'doubtful' => 'Nghi ngờ',
+                'completed' => 'Hoàn thành',
+                'interested' => 'Quan tâm',
+                'exploring' => 'Tìm hiểu',
+                'inactive' => 'Ngừng khai thác',
+                'reserved' => 'Bảo lưu',
+                'rejected' => 'Từ chối',
+                'contact_again' => 'Liên hệ lại',
+            ];
+
+            $appointments = $appointments->map(function ($appointment) use ($statusLabels) {
+                return [
+                    'id' => $appointment->id,
+                    'title' => $appointment->title,
+                    'content' => $appointment->content,
+                    'status' => $appointment->status,
+                    'status_label' => $statusLabels[$appointment->status] ?? ucfirst($appointment->status),
+                    'contact_date' => $appointment->contact_date ? $appointment->contact_date->format('d/m/Y H:i') : null, // Include time
+                    'created_at' => $appointment->created_at->format('d/m/Y H:i'),
+                ];
             });
+
+            return response()->json(['appointments' => $appointments], 200);
+        } catch (\Exception $e) {
+            Log::error('Error fetching appointments: ' . $e->getMessage(), [
+                'request' => $request->all(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json([
+                'message' => 'Error fetching appointments: ' . $e->getMessage(),
+                'error' => $e->getMessage(),
+            ], 500);
         }
+    }
 
-        // Marketing source filter
-        if ($request->filled('marketing_source')) {
-            $query->where('marketing_source', $request->marketing_source);
+    public function updateContactAgainStatus(Request $request)
+{
+    try {
+        // Validate với các trường bắt buộc
+        $validated = $request->validate([
+            'id' => 'required|exists:parent_appointments,id',
+            'parent_id' => 'required|exists:parents,user_id',
+            'status' => 'required|string'
+        ]);
+        
+        // Rest of the method...
+    } catch (\Exception $e) {
+        Log::error('Error updating appointment status: ' . $e->getMessage());
+        return response()->json([
+            'success' => false,
+            'message' => 'Lỗi khi cập nhật trạng thái: ' . $e->getMessage()
+        ], 422);
+    }
+}
+
+
+    public function updateParentStatus(Request $request)
+    {
+        try {
+            // Validate chỉ các trường cần thiết
+            $validated = $request->validate([
+                'parent_id' => 'required|exists:parents,user_id',
+                'status' => 'required|string',
+                'id' => 'nullable|exists:parent_appointments,id' // Optional
+            ]);
+
+            DB::beginTransaction();
+
+            // 1. Cập nhật trạng thái của parent
+            $parent = ParentModel::where('user_id', $validated['parent_id'])->firstOrFail();
+            $parent->status = $validated['status'];
+            $parent->save();
+
+            // 2. Cập nhật appointment nếu có
+            if (!empty($validated['id'])) {
+                $appointment = ParentAppointment::findOrFail($validated['id']);
+                $appointment->status = $validated['status'];
+                $appointment->save();
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Cập nhật trạng thái thành công'
+            ]);
+
+        } catch (ValidationException $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Dữ liệu không hợp lệ',
+                'errors' => $e->errors()
+            ], 422);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error updating parent status: ' . $e->getMessage(), [
+                'request' => $request->all(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Lỗi khi cập nhật trạng thái: ' . $e->getMessage()
+            ], 500);
         }
+    }
 
-        // Learning format filter
-        if ($request->filled('learning_format')) {
-            $query->where('learning_format', $request->learning_format);
+     //Liên hệ lần 2
+    public function getAllContactAgainAppointments(Request $request)
+    {
+        try {
+            $date = $request->input('date', Carbon::today()->toDateString());
+            $search = $request->input('search', '');
+
+            $query = ParentAppointment::where('status', 'contact_again')
+                ->whereDate('contact_date', $date)
+                ->with(['parent' => function ($query) {
+                    $query->with('user');
+                }]);
+
+            if ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('title', 'like', '%' . $search . '%')
+                      ->orWhere('content', 'like', '%' . $search . '%');
+                });
+            }
+
+            $appointments = $query->orderBy('contact_date', 'asc')->get();
+            // dd($appointments);
+
+            $statusLabels = [
+                'pending' => 'Đang chờ',
+                'contacted' => 'Đã liên hệ',
+                'doubtful' => 'Nghi ngờ',
+                'completed' => 'Hoàn thành',
+                'interested' => 'Quan tâm',
+                'exploring' => 'Tìm hiểu',
+                'inactive' => 'Ngừng khai thác',
+                'reserved' => 'Bảo lưu',
+                'rejected' => 'Từ chối',
+                'contact_again' => 'Liên hệ lại',
+            ];
+
+            $appointments = $appointments->map(function ($appointment) use ($statusLabels) {
+                return [
+                    'id' => $appointment->id,
+                    'title' => $appointment->title,
+                    'content' => $appointment->content,
+                    'status' => $appointment->status,
+                    'status_label' => $statusLabels[$appointment->status] ?? ucfirst($appointment->status),
+                    'contact_date' => $appointment->contact_date ? $appointment->contact_date->format('d/m/Y H:i') : null,
+                    'raw_contact_date' => $appointment->contact_date ? $appointment->contact_date->toDateTimeString() : null, // Keep raw DATETIME
+                    'created_at' => $appointment->created_at->format('d/m/Y H:i'),
+                    'parent_name' => $appointment->parent && $appointment->parent->user ? $appointment->parent->user->name : 'N/A',
+                ];
+            });
+
+            $groupedAppointments = $appointments->groupBy(function ($appointment) {
+                return Carbon::parse($appointment['raw_contact_date'])->format('Y-m-d');
+            });
+
+            return view('admin.parents.contact_again', [
+                'groupedAppointments' => $groupedAppointments,
+                'selectedDate' => $date,
+                'search' => $search,
+                'statusLabels' => $statusLabels,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error fetching contact again appointments: ' . $e->getMessage(), [
+                'request' => $request->all(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return back()->with('error', 'Lỗi khi tải danh sách lịch hẹn: ' . $e->getMessage());
         }
-
-        // Status filter
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
-
-        // Date range filter
-        if ($request->filled('from_date')) {
-            $query->whereDate('created_at', '>=', $request->from_date);
-        }
-        if ($request->filled('to_date')) {
-            $query->whereDate('created_at', '<=', $request->to_date);
-        }
-
-        // Rows per page
-        $perPage = $request->input('per_page', 4);
-
-        // Get paginated results
-        $parents = $query->paginate($perPage);
-
-        // Additional data
-        $allSubjects = Subject::pluck('subject_name', 'id')->toArray();
-
-
-        $statuses = ['pending', 'contacted', 'doubtful', 'completed', 'interested', 'exploring', 'inactive', 'reserved', 'rejected'];
-
-        return view('admin.parents', compact('parents', 'allSubjects', 'statuses'));
-
     }
 
 
+   
+  
 
-
-
-
+   
 
 
 
@@ -734,8 +983,8 @@ class AdminController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error('Student creation failed: ' . $e->getMessage());
-            \Log::error($e->getTraceAsString());
+            Log::error('Student creation failed: ' . $e->getMessage());
+            Log::error($e->getTraceAsString());
             return back()
                 ->with('error', 'Đã xảy ra lỗi khi thêm học sinh. Vui lòng kiểm tra dữ liệu và thử lại.')
                 ->withInput();
@@ -771,7 +1020,7 @@ class AdminController extends Controller
      */
     public function viewStudent($id)
     {
-        \Log::info('viewStudent called with ID: ' . $id);
+        Log::info('viewStudent called with ID: ' . $id);
         $student = Student::with('user')->where('user_id', $id)->first();
 
         $parent = DB::table('students')
@@ -789,7 +1038,7 @@ class AdminController extends Controller
         )->first();
         // dd($parent);
         if (!$student) {
-            \Log::error('Student not found for user_id: ' . $id);
+            Log::error('Student not found for user_id: ' . $id);
             return redirect()->route('admin.students')->with('error', 'Không tìm thấy học sinh.');
         }
 
@@ -1006,7 +1255,7 @@ class AdminController extends Controller
             $students = $query->paginate($perPage);
 
             // Debug pagination
-            \Log::info('Student Pagination Debug', [
+            Log::info('Student Pagination Debug', [
                 'total' => $students->total(),
                 'perPage' => $students->perPage(),
                 'hasPages' => $students->hasPages(),
@@ -1123,7 +1372,7 @@ class AdminController extends Controller
                     'status' => 'active', // Default status
                 ]);
 
-                \Log::info('Teacher created successfully with ID: ' . $teacher->id);
+                Log::info('Teacher created successfully with ID: ' . $teacher->id);
 
                 DB::commit();
                 return redirect()->route('admin.teachers')
@@ -1131,8 +1380,8 @@ class AdminController extends Controller
 
             } catch (\Exception $e) {
                 DB::rollBack();
-                \Log::error('Teacher creation failed: ' . $e->getMessage());
-                \Log::error($e->getTraceAsString());
+                Log::error('Teacher creation failed: ' . $e->getMessage());
+                Log::error($e->getTraceAsString());
                 return back()
                     ->with('error', 'Đã xảy ra lỗi khi thêm giáo viên: ' . $e->getMessage())
                     ->withInput();
@@ -1143,11 +1392,11 @@ class AdminController extends Controller
 
         public function viewTeacher($id)
         {
-            \Log::info('viewTeacher called with ID: ' . $id);
+            Log::info('viewTeacher called with ID: ' . $id);
             $teacher = Teacher::with('user')->where('user_id', $id)->first();
 
             if (!$teacher) {
-                \Log::error('Teacher not found for user_id: ' . $id);
+                Log::error('Teacher not found for user_id: ' . $id);
                 return redirect()->route('admin.teachers')->with('error', 'Không tìm thấy giáo viên.');
             }
 
@@ -1159,7 +1408,7 @@ class AdminController extends Controller
          */
         public function editTeacher($id)
         {
-            // \Log::info('editTeacher called with ID: ' . $id);
+            // Log::info('editTeacher called with ID: ' . $id);
             $teacher = DB::table('teachers')
                 ->join('users', 'teachers.user_id', '=', 'users.id')
                 ->select(
@@ -1261,7 +1510,7 @@ class AdminController extends Controller
                 $teacher->save();
 
                 DB::commit();
-                // \Log::info('Teacher updated successfully for user_id: ' . $id);
+                // Log::info('Teacher updated successfully for user_id: ' . $id);
                 return redirect()->route('admin.teachers')->with('success', 'Cập nhật thông tin giáo viên thành công!');
             } catch (\Exception $e) {
                 DB::rollBack();
@@ -1272,11 +1521,11 @@ class AdminController extends Controller
 
         public function deleteTeacher($id)
         {
-            \Log::info('deleteTeacher called with ID: ' . $id);
+            Log::info('deleteTeacher called with ID: ' . $id);
             $teacher = Teacher::where('user_id', $id)->first();
 
             if (!$teacher) {
-                \Log::error('Teacher not found for user_id: ' . $id);
+                Log::error('Teacher not found for user_id: ' . $id);
                 return redirect()->route('admin.teachers')->with('error', 'Không tìm thấy giáo viên.');
             }
 
@@ -1297,12 +1546,12 @@ class AdminController extends Controller
                 $teacher->user->delete();
 
                 DB::commit();
-                \Log::info('Teacher deleted successfully for user_id: ' . $id);
+                Log::info('Teacher deleted successfully for user_id: ' . $id);
                 return redirect()->route('admin.teachers')
                     ->with('success', 'Xóa giáo viên thành công!');
             } catch (\Exception $e) {
                 DB::rollBack();
-                \Log::error('Error deleting teacher: ' . $e->getMessage());
+                Log::error('Error deleting teacher: ' . $e->getMessage());
                 return redirect()->route('admin.teachers')
                     ->with('error', 'Đã xảy ra lỗi khi xóa giáo viên: ' . $e->getMessage());
             }
@@ -1335,7 +1584,7 @@ class AdminController extends Controller
         $teachers = $query->paginate($perPage);
 
         // Debug pagination
-        \Log::info('Teacher Pagination Debug', [
+        Log::info('Teacher Pagination Debug', [
             'total' => $teachers->total(),
             'perPage' => $teachers->perPage(),
             'hasPages' => $teachers->hasPages(),
@@ -1363,6 +1612,7 @@ class AdminController extends Controller
 
         return response()->json(['success' => true, 'message' => 'Cập nhật trạng thái thành công']);
     }
+
 
 
 

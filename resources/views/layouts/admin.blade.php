@@ -30,6 +30,7 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('css/sweetalert.min.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('css/custom.css') }}">
     <!-- Trong <head> -->
+    <link href="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.css" rel="stylesheet"> <!-- Này là thông báo -->
 
     @stack("styles")
 {{-- <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" /> --}}
@@ -136,12 +137,36 @@
                                         <div class="text">Lịch học</div>
                                     </a>
                                 </li>
+                                
                                 <li class="menu-item">
                                     <a href="{{ route('schedules.teacherSchedule') }}" class="">
                                         <div class="icon"><i class="icon-image"></i></div>
-                                        <div class="text">Lịch dạy của của giáo viên</div>
+                                        <div class="text p-0 m-0 text-start">Lịch dạy của của giáo viên</div>
                                     </a>
                                 </li>
+{{-- Giao dịch & công nợ --}}
+                                <li class="menu-item">
+                                    <a href="{{ route('admin.transactions') }}" class="">
+                                        <div class="icon">
+                                            <i class="icon-repeat"></i>
+                                        </div>
+                                        <div class="text">Giao dịch</div>
+                                    </a>
+                                </li>
+
+                                <li class="menu-item">
+                                    <a href="{{ route('admin.transactions.accountsPayable') }}" class="">
+                                        <div class="icon">
+                                            <i class="icon-credit-card"></i>
+                                        </div>
+                                        <div class="text">Công nợ</div>
+                                    </a>
+                                </li>
+                                
+
+
+
+
 
                                 {{-- <li class="menu-item has-children">
                                     <a href="javascript:void(0)" class="menu-item-button">

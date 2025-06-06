@@ -1700,8 +1700,10 @@ progress {
   background-color: rgba(255, 255, 255, 0.85);
   background-clip: padding-box;
   border: 1px solid rgba(0, 0, 0, 0.1);
-  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-  border-radius: 0.25rem; }
+  box-shadow: 0 0.5rem 1rem rgba(255, 1, 1, 0.15);
+  border-radius: 0.25rem;
+  color: #141414;
+}
   .toast:not(.showing):not(.show) {
     opacity: 0; }
   .toast.hide {
@@ -1710,10 +1712,14 @@ progress {
 .toast-container {
   width: max-content;
   max-width: 100%;
-  pointer-events: none; }
+  pointer-events: none;
+  display: block;
+}
   .toast-container > :not(:last-child) {
     margin-bottom: 0.75rem; }
-
+.toast-message{
+  color: #141414;
+}
 .toast-header {
   display: flex;
   align-items: center;
@@ -6050,7 +6056,7 @@ progress {
  *
  * bootstrap-slider is released under the MIT License
  * Copyright (c) 2019 Kyle Kemp, Rohit Kalkur, and contributors
- * 
+ *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without
@@ -6059,10 +6065,10 @@ progress {
  * copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following
  * conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -8668,6 +8674,8 @@ img {
 .table-responsive {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch; }
+.table-responsive2 {
+  -webkit-overflow-scrolling: touch; }
 
 @media (max-width: 575.98px) {
   .table-responsive-sm {
@@ -8803,13 +8811,13 @@ img {
 
 .btn-primary {
   color: #fff;
-  background-color: #222222;
-  border-color: #222222;
+  background-color: #0097fe;
+  border-color: #0097fe;
   box-shadow: none; }
   .btn-primary:hover {
     color: #fff;
-    background-color: #1d1d1d;
-    border-color: #1b1b1b; }
+    background-color: #00c8f9;
+    border-color: #00c8f9; }
   .btn-check:focus + .btn-primary, .btn-primary:focus {
     color: #fff;
     background-color: #1d1d1d;
@@ -8899,8 +8907,8 @@ img {
 
 .btn-success {
   color: #000;
-  background-color: #def2d7;
-  border-color: #def2d7;
+  background-color: #15ea30;
+  border-color: #fff;
   box-shadow: none; }
   .btn-success:hover {
     color: #000;
@@ -8947,12 +8955,12 @@ img {
 
 .btn-info {
   color: #000;
-  background-color: #cde9f6;
-  border-color: #cde9f6;
+  background-color: #00c8f9;
+  border-color: #6ed9f1;
   box-shadow: none; }
   .btn-info:hover {
     color: #000;
-    background-color: #d5ecf7;
+    background-color: #6ed9f1;
     border-color: #d2ebf7; }
   .btn-check:focus + .btn-info, .btn-info:focus {
     color: #000;
@@ -8995,7 +9003,7 @@ img {
 
 .btn-warning {
   color: #000;
-  background-color: #f7f3d7;
+  background-color: #f89909;
   border-color: #f7f3d7;
   box-shadow: none; }
   .btn-warning:hover {
@@ -9043,12 +9051,12 @@ img {
 
 .btn-danger {
   color: #000;
-  background-color: #ecc8c5;
-  border-color: #ecc8c5;
-  box-shadow: none; }
+  background-color: #fd2d2b;
+  border-color: red;
+  box-shadow: none; } 
   .btn-danger:hover {
     color: #000;
-    background-color: #efd0ce;
+    background-color: var(--bs-red);
     border-color: #eececb; }
   .btn-check:focus + .btn-danger, .btn-danger:focus {
     color: #000;
@@ -9878,7 +9886,7 @@ textarea.form-control-lg {
     padding: 1.125rem 1.3125rem 0.9rem; }
   .form-floating > label {
     position: absolute;
-    top: 1rem;
+    top: 0.7rem;
     left: 0.75rem;
     padding: 0 0.5rem;
     pointer-events: none;
@@ -14807,8 +14815,7 @@ button.js-add-wishlist.active .flaticon.flaticon-heart, a.add-to-wishlist.active
       font-size: 1rem;
       /* border-bottom: 2px solid;  */
     }
-  .my-account__address-item__detail {
-    line-height: 1.5rem; }
+
     .my-account__address-item__detail p {
       margin: 0; }
 .my-account__edit .btn-primary {
@@ -14817,23 +14824,7 @@ button.js-add-wishlist.active .flaticon.flaticon-heart, a.add-to-wishlist.active
   max-width: 100%;
   text-transform: uppercase;
   font-size: 0.875rem; }
-.my-account__wishlist .btn-remove-from-wishlist {
-  position: absolute;
-  left: 1.25rem;
-  top: 1.25rem;
-  z-index: 2;
-  border: 0;
-  background-color: #fff;
-  width: 2.5rem;
-  height: 2.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 4px;
-  transition: all .3s ease;
-  box-shadow: 0 0 1px rgba(0, 0, 0, 0.1);
-  opacity: 0;
-  visibility: hidden; }
+
 .my-account__wishlist .product-card:hover .btn-remove-from-wishlist {
   opacity: 1;
   visibility: visible; }

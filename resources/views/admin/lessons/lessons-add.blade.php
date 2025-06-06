@@ -13,7 +13,7 @@
                             class="text-danger fw-bold">{{ $subjectsDetail->subject_name }}</span>"
                     </h3>
                     <div class="mt-4">
-                        <a class="tf-button style-1 w208" href="{{ route('admin.courses') }}">
+                        <a class="tf-button style-1 w208" href="{{ route('admin.lessons', ['id' => $subjectsDetail->id]) }}">
                             <i class="icon-arrow-left"></i> Quay lại
                         </a>
                     </div>
@@ -56,17 +56,35 @@
                         <fieldset class="my-3 col-lg-6 col-md-12 p-3">
                             <label class="body-title mb-4">Chủ đề</label>
                             <input type="text" name="topic" value="{{ old('topic') }}">
+                            @error('topic')
+                                <div class="text-danger mt-2">{{ $message }}</div>
+                            @enderror
                         </fieldset>
+
+
 
                         <fieldset class="my-3 col-lg-6 col-md-12 p-3">
                             <label class="body-title mb-4">Tên bài giảng <span class="tf-color-1">*</span></label>
                             <input type="text" name="lesson_name" value="{{ old('lesson_name') }}">
+                            @error('lesson_name')
+                                <div class="text-danger mt-2">{{ $message }}</div>
+                            @enderror
+
                         </fieldset>
+
+
+
 
                         <fieldset class="my-3 col-lg-6 col-md-12 p-3">
                             <label class="body-title mb-4">Mô tả nội dung <span class="tf-color-1">*</span></label>
                             <input type="text" name="content" value="{{ old('content') }}">
+                            @error('content')
+                                <div class="text-danger mt-2">{{ $message }}</div>
+                            @enderror
+
                         </fieldset>
+
+
 
                         <fieldset class="my-3 col-lg-6 col-md-12 p-3">
                             <label class="body-title mb-4">Loại nội dung </label>
@@ -75,6 +93,10 @@
                                 <option value="Video">Video</option>
                             </select>
                         </fieldset>
+                        @error('file_type')
+                            <div class="text-danger mt-2">{{ $message }}</div>
+                        @enderror
+
 
                         {{-- <div class="my-3 col-lg-6 col-md-12 p-3" id="content-wrapper">
                             <label class="body-title mb-4">Nội dung</label>
@@ -90,7 +112,13 @@
                             </select>
                             <!-- Hidden input to actually send value -->
                             <input type="hidden" name="teacher_id" value="{{ $subjectsDetail->teacher_permission }}">
+                            @error('teacher_id')
+                                <div class="text-danger mt-2">{{ $message }}</div>
+                            @enderror
+
                         </fieldset>
+
+
 
 
                         <fieldset class="my-3 col-lg-6 col-md-12 p-3">
@@ -102,7 +130,13 @@
                                 <option value="Webinar">Webinar</option>
                                 <option value="Hội thảo">Hội thảo</option>
                             </select>
+                            @error('type')
+                                <div class="text-danger mt-2">{{ $message }}</div>
+                            @enderror
                         </fieldset>
+
+
+
 
                         <fieldset class="my-3 col-lg-6 col-md-12 p-3">
                             <label class="body-title mb-4">Hình thức</label>
@@ -110,12 +144,32 @@
                                 <option value="Offline">Offline</option>
                                 <option value="Online">Online</option>
                             </select>
+                            @error('fee_type')
+                                <div class="text-danger mt-2">{{ $message }}</div>
+                            @enderror
                         </fieldset>
+
+
+
 
                         <fieldset class="my-3 col-lg-6 col-md-12 p-3">
                             <label class="body-title mb-4">Thời lượng</label>
                             <input type="time" name="duration" value="{{ old('duration', '01:30:00') }}">
+                            @error('duration')
+                                <div class="text-danger mt-2">{{ $message }}</div>
+                            @enderror
                         </fieldset>
+
+
+
+                        <fieldset class="my-3 col-lg-6 col-md-12 p-3">
+                            <label class="body-title mb-4">File bài giảng</label>
+                            <input type="file" name="file_link">
+                            @error('file_link')
+                                <div class="text-danger mt-2">{{ $message }}</div>
+                            @enderror
+                        </fieldset>
+
 
                         <div class="mt-4 col-lg-12 col-md-12 p-3">
                             <button type="submit" class="tf-button w-full">Thêm bài giảng</button>
@@ -124,10 +178,12 @@
                 </div>
             </form>
         </div>
+
     </div>
 @endsection
 @push('scripts')
     <script>
+
         $(function() {
             $(".delete").on('click', function(e) {
                 e.preventDefault();

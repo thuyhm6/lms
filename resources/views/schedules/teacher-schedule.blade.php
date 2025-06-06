@@ -78,55 +78,70 @@
                                 <th>Ngày dạy</th>
                                 <th>Nội dung</th>
                                 <th>Địa điểm (lớp học)</th>
+                                <th>Số học sinh</th>
                                 <th>Ghi chú</th>
                                 <th>Hình thức học</th>
-                                <th>Điểm danh</th>
+                                {{-- <th>Điểm danh</th> --}}
                                 {{-- <th>Trạng thái</th> --}}
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($classes as $class)
+                            @forelse ($teacherSchedules as $class)
                                 <tr>
-                                    <td>{{ $class->stt }}</td>
+                                    <td>{{ $class->teacher_id }}</td>
                                     <td>{{ $class->teacher_name ?? 'Chưa có' }}</td>
                                     <td>Chưa có</td>
                                     <td class="">
                                         @if ($class->start_date && $class->start_time && $class->end_time)
                                             {{ \Carbon\Carbon::parse($class->start_date)->format('d/m/Y') }}<br>
-                                            <span class="btn btn-danger text-white">{{ \Carbon\Carbon::parse($class->start_time)->format('H:i') }}</span> -
-                                            <span class="btn btn-info text-white">{{ \Carbon\Carbon::parse($class->end_time)->format('H:i') }}</span>
+                                            <span
+                                                class="btn btn-danger text-white">{{ \Carbon\Carbon::parse($class->start_time)->format('H:i') }}</span>
+                                            -
+                                            <span
+                                                class="btn btn-info text-white">{{ \Carbon\Carbon::parse($class->end_time)->format('H:i') }}</span>
                                         @else
                                             N/A
                                         @endif
                                     </td>
                                     <td>
-                                        <span class="btn btn-danger text-white">{{ $class->course_name ?? 'N/A' }}</span>
-                                        <br>
-                                        <span class="btn btn-primary text-white">{{ $class->subject_name ?? 'N/A' }}</span>
-                                        <br>
-                                        @if (count($class->lessons) > 0)
+                                        <a href="{{ route('schedules.detail', ['id' => $class->schedule_id]) }}">
+                                            <span class="btn btn-danger text-white">{{ $class->courses ?? 'N/A' }}</span>
+                                            <br>
+                                            <span class="btn btn-primary text-white">{{ $class->subjects ?? 'N/A' }}</span>
+                                            <br>
+                                            {{-- @if (count($class->ten_bai_hoc) > 0) --}}
                                             <br>
                                             <small class="btn btn-info text-white">
-                                                {{ implode(', ', $class->lessons) }}
+                                                {{ $class->lessons ?? 'N/A' }}
                                             </small>
-                                        @endif
+                                            {{-- @endif --}}
+                                        </a>
                                     </td>
                                     <td>
-                                        <span class="btn btn-success text-white">{{ $class->class_name ?? 'Chưa có' }}</span><br>
-                                       <span class="btn btn-warnin text-white"> {{ $class->class_code ?? 'Chưa có' }}</span>
+                                        <span
+                                            class="btn btn-success text-white">{{ $class->class_name ?? 'Chưa có' }}</span><br>
+                                        <span class="btn btn-warnin text-white">
+                                            {{ $class->class_code ?? 'Chưa có' }}</span>
                                     </td>
-                                    <td>{{ $class->note ?? 'Không có' }}</td>
+                                    <td>
+                                        <a href="{{ route('schedules.students', $class->schedule_id) }}">Xem danh
+                                            sách({{ $class->student_count }})</a>
+                                    </td>
+                                    <td>{{ $class->schedule_notes ?? 'Không có' }}</td>
                                     <td>{{ $class->learning_format ?? 'Chưa có' }}</td>
-                                    <td>Chưa có</td>
+                                    {{-- <td>Chưa có</td> --}}
                                     {{-- <td>
                                         <span
                                             class="badge {{ $class->status == 'online' ? 'badge-success' : 'badge-warning' }}">
                                             {{ $class->status ?? 'Chưa có' }}
                                         </span>
                                     </td> --}}
-                                    
                                 </tr>
-                            @endforeach
+                            @empty
+                                <tr>
+                                    <td colspan="9" class="text-center">Không có lịch học nào trong lớp này</td>
+                                </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>

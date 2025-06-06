@@ -40,9 +40,9 @@
                       <label for="new_password_confirmation">Confirm new password</label>
                       @error('new_password_confirmation') <span class="text-danger">{{ $message }}</span> @enderror
                       @if (Session::has('success'))
-                        <p class="text-success">{{ Session::get('success') }}</p>
+                        <p class="" style="color:rgb(0, 192, 0)">{{ Session::get('success') }}</p>
                     @elseif (Session::has('error'))
-                        <p class="text-danger">{{ Session::get('error') }}</p>
+                        <p class="" style="color: red">{{ Session::get('error') }}</p>
                     @endif
                     </div>
                   </div>

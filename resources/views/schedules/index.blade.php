@@ -838,12 +838,11 @@
                 startTime: startTime,
                 endTime: endTime,
                 teacher_id: teacherId,
-                assistant_teacher_id: assistantTeacherId ? parseInt(assistantTeacherId) :
-                null, // Mặc định là null nếu không chọn
-                subject_id: subjectId,
+                assistant_teacher_id: assistantTeacherId ? parseInt(assistantTeacherId) : null, // Mặc định là null nếu không chọn
+                // subject_id: subjectId,
                 lesson_ids: selectedLessons,
                 note: note || null, // Gửi note, mặc định null nếu rỗng
-                course_id: courseId // Thêm course_id vào formData
+                // course_id: courseId // Thêm course_id vào formData
             };
 
             alert(JSON.stringify(formData, null, 2))
