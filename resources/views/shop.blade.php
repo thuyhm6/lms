@@ -17,7 +17,14 @@
     color: red;
   }
 </style>
-<main class="pt-90">
+<header class="page-header wow fadeInUp" data-wow-delay="0.5s" data-background="img/hotel-room.jpg">
+    <div class="container">
+        <h2>Rooms & Rates</h2>
+        <div class="bosluk3"></div>
+        <p><a href="index-2.html">Home</a> <i class="flaticon-right-chevron"></i> Rooms & Rates </p>
+    </div>
+    <!-- end container --> 
+    </header>
     <section class="shop-main container d-flex pt-4 pt-xl-5">
       <div class="shop-sidebar side-sticky bg-body" id="shopFilter">
         <div class="aside-header d-flex d-lg-none align-items-center">
@@ -194,88 +201,7 @@
       </div>
 
       <div class="shop-list flex-grow-1">
-        <div class="swiper-container js-swiper-slider slideshow slideshow_small slideshow_split" data-settings='{
-            "autoplay": {
-              "delay": 5000
-            },
-            "slidesPerView": 1,
-            "effect": "fade",
-            "loop": true,
-            "pagination": {
-              "el": ".slideshow-pagination",
-              "type": "bullets",
-              "clickable": true
-            }
-          }'>
-          <div class="swiper-wrapper">
-            <div class="swiper-slide">
-              <div class="slide-split h-100 d-block d-md-flex overflow-hidden">
-                <div class="slide-split_text position-relative d-flex align-items-center"
-                  style="background-color: #f5e6e0;">
-                  <div class="slideshow-text container p-3 p-xl-5">
-                    <h2
-                      class="text-uppercase section-title fw-normal mb-3 animate animate_fade animate_btt animate_delay-2">
-                      Women's <br /><strong>ACCESSORIES</strong></h2>
-                    <p class="mb-0 animate animate_fade animate_btt animate_delay-5">Accessories are the best way to
-                      update your look. Add a title edge with new styles and new colors, or go for timeless pieces.</h6>
-                  </div>
-                </div>
-                <div class="slide-split_media position-relative">
-                  <div class="slideshow-bg" style="background-color: #f5e6e0;">
-                    <img loading="lazy" src="assets/images/shop/shop_banner3.jpg" width="630" height="450"
-                      alt="Women's accessories" class="slideshow-bg__img object-fit-cover" />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="swiper-slide">
-              <div class="slide-split h-100 d-block d-md-flex overflow-hidden">
-                <div class="slide-split_text position-relative d-flex align-items-center"
-                  style="background-color: #f5e6e0;">
-                  <div class="slideshow-text container p-3 p-xl-5">
-                    <h2
-                      class="text-uppercase section-title fw-normal mb-3 animate animate_fade animate_btt animate_delay-2">
-                      Women's <br /><strong>ACCESSORIES</strong></h2>
-                    <p class="mb-0 animate animate_fade animate_btt animate_delay-5">Accessories are the best way to
-                      update your look. Add a title edge with new styles and new colors, or go for timeless pieces.</h6>
-                  </div>
-                </div>
-                <div class="slide-split_media position-relative">
-                  <div class="slideshow-bg" style="background-color: #f5e6e0;">
-                    <img loading="lazy" src="assets/images/shop/shop_banner3.jpg" width="630" height="450"
-                      alt="Women's accessories" class="slideshow-bg__img object-fit-cover" />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="swiper-slide">
-              <div class="slide-split h-100 d-block d-md-flex overflow-hidden">
-                <div class="slide-split_text position-relative d-flex align-items-center"
-                  style="background-color: #f5e6e0;">
-                  <div class="slideshow-text container p-3 p-xl-5">
-                    <h2
-                      class="text-uppercase section-title fw-normal mb-3 animate animate_fade animate_btt animate_delay-2"> Women's <br /><strong>ACCESSORIES</strong></h2>
-                    <p class="mb-0 animate animate_fade animate_btt animate_delay-5">Accessories are the best way to
-                      update your look. Add a title edge with new styles and new colors, or go for timeless pieces.</h6>
-                  </div>
-                </div>
-                <div class="slide-split_media position-relative">
-                  <div class="slideshow-bg" style="background-color: #f5e6e0;">
-                    <img loading="lazy" src="assets/images/shop/shop_banner3.jpg" width="630" height="450"
-                      alt="Women's accessories" class="slideshow-bg__img object-fit-cover" />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="container p-3 p-xl-5">
-            <div class="slideshow-pagination d-flex align-items-center position-absolute bottom-0 mb-4 pb-xl-2"></div>
-
-          </div>
-        </div>
+        
 
         <div class="mb-3 pb-2 pb-xl-3"></div>
 
@@ -434,7 +360,6 @@
         </div>
       </div>
     </section>
-  </main>
 
   <form id="frmfilter" method="GET" action="{{ route('shop.index') }}">
     @csrf

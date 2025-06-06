@@ -51,8 +51,8 @@
                 <div class="section-menu-left">
                     <div class="box-logo">
                         <a href="{{ route('admin.index') }}" id="site-logo-inner">
-                            <img class="" id="logo_header" alt="" src="{{ asset('images/logo/logo.jpg') }}"
-                                data-light="{{ asset('images/logo/logo.jpg') }}" data-dark="{{ asset('images/logo/logo.jpg') }}">
+                            <img class="" id="logo_header" alt="" src="{{ asset('images/logo/logo.png') }}"
+                                data-light="{{ asset('images/logo/logo.png') }}" data-dark="{{ asset('images/logo/logo.png') }}">
                         </a>
                         <div class="button-show-hide">
                             <i class="icon-menu-left"></i>
@@ -88,6 +88,11 @@
                                         <li class="sub-menu-item">
                                             <a href="{{ route('admin.topic') }}" class="">
                                                 <div class="text">Chủ đề</div>
+                                            </a>
+                                        </li>
+                                        <li class="sub-menu-item">
+                                            <a href="{{ route('admin.slides') }}" class="">
+                                                <div class="text">Slides</div>
                                             </a>
                                         </li>
                                     </ul>
@@ -230,9 +235,9 @@
                         <div class="wrap">
                             <div class="header-left">
                                 <a href="index-2.html">
-                                    <img class="" id="logo_header_mobile" alt="" src="{{ asset('images/logo/logo.jpg') }}"
-                                        data-light="{{ asset('images/logo/logo.jpg') }}" data-dark="{{ asset('images/logo/logo.jpg') }}"
-                                        data-width="154px" data-height="52px" data-retina="{{ asset('images/logo/logo.jpg') }}">
+                                    <img class="" id="logo_header_mobile" alt="" src="{{ asset('images/logo/logo.png') }}"
+                                        data-light="{{ asset('images/logo/logo.png') }}" data-dark="{{ asset('images/logo/logo.png') }}"
+                                        data-width="154px" data-height="52px" data-retina="{{ asset('images/logo/logo.png') }}">
                                 </a>
                                 <div class="button-show-hide">
                                     <i class="icon-menu-left"></i>

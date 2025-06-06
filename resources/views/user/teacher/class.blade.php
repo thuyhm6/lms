@@ -118,132 +118,123 @@
             background-color: rgb(255, 0, 0);
         }
 
-        /* .table-responsive2 .btn {
-            padding: 6px 12px;
-            font-size: 14px;
-            border-radius: 4px;
-            background-color: #00ba2f;
-            color: #ffffff;
-        } */
+        
     </style>
     @section('content')
-        <main class="pt-90">
-            <div class="mb-4 pb-4"></div>
-            <section class="my-account container">
-                <h2 class="page-title">My Account</h2>
-                <div class="row">
-                    <div class="col-lg-3">
-                        @include('user.account-nav')
-                    </div>
-                    <div class="col-lg-9">
-                        <div class="page-content my-account__dashboard">
-                            <h2>LỚP HỌC QUẢN LÝ CỦA GIÁO VIÊN <span class="text-primary"> {{ Auth::user()->full_name }}</span>
-                            </h2>
-                            <div class="filter-wrapper mb-4 d-flex flex-wrap align-items-center gap-3">
-                                {{-- <form method="GET" action="{{ route('teacher.schedules.filter') }}" class="filter-form w-100"
-                                    id="searchForm">
-                                    <input type="hidden" name="limit" id="limit" value="10">
-                                    <div class="filter-group">
-                                        <label for="from_date">Từ ngày:</label>
-                                        <input type="date" id="from_date" name="from_date"
-                                            value="{{ request('from_date') }}">
-                                    </div>
-                                    <div class="filter-group">
-                                        <label for="to_date">Đến ngày:</label>
-                                        <input type="date" id="to_date" name="to_date" value="{{ request('to_date') }}">
-                                    </div>
-                                    <button type="submit" class="btn btn-primary">Lọc</button>
-                                    <button type="reset" class="btn btn-primary">Xóa</button>
-                                </form> --}}
-                                <div id="messageError" class="w-100">
+        <section class="my-account container">
+            <h2 class="page-title">My Account</h2>
+            <div class="row">
+                <div class="col-lg-3">
+                    @include('user.account-nav')
+                </div>
+                <div class="col-lg-9">
+                    <div class="page-content my-account__dashboard">
+                        <h2>LỚP HỌC QUẢN LÝ CỦA GIÁO VIÊN <span class="text-primary"> {{ Auth::user()->full_name }}</span>
+                        </h2>
+                        <div class="filter-wrapper mb-4 d-flex flex-wrap align-items-center gap-3">
+                            {{-- <form method="GET" action="{{ route('teacher.schedules.filter') }}" class="filter-form w-100"
+                                id="searchForm">
+                                <input type="hidden" name="limit" id="limit" value="10">
+                                <div class="filter-group">
+                                    <label for="from_date">Từ ngày:</label>
+                                    <input type="date" id="from_date" name="from_date"
+                                        value="{{ request('from_date') }}">
                                 </div>
-                            </div>
-                            <div class="table-responsive2">
-                                <table class="">
-                                    <thead class="">
-                                        <tr>
-                                            {{-- <th scope="col" style="width: 5%;"><input type="checkbox" class="form-check-input"></th> --}}
-                                            <th scope="col" style="width: 5%;">STT</th>
-                                            <th scope="col" style="width: 5%;">Mã lớp</th>
-                                            <th scope="col" style="width: 10%;">Tên lớp</th>
-                                            <th scope="col" style="width: 10%;">Thuộc trung tâm</th>
-                                            <th scope="col">Lịch học</th>
-                                            <th scope="col" style="width: 7%;">Mô tả</th>
-                                            <th scope="col" style="width: 10%;">Số học sinh</th>
-                                            <th scope="col">Trạng thái</th>
-                                            <th scope="col" style="width: 5%;"></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="body-schedules">
-                                        @foreach ($classes as $index => $class)
-                                            <tr>
-                                                <td>{{ $index + 1 }}</td>
-                                                <td>{{ $class->ma_lop }}</td>
-                                                <td><span class="btn btn-sm btn-danger text-white">{{ $class->ten_lop }}</span></td>
-                                                <td><strong>TIPY STEM - Thanh Hóa</strong></td>
-                                                <td>
-                                                    <span class="btn btn-sm btn-info text-white">{{ $class->lich_hoc }}</span>
-                                                </td>
-
-                                                <td>{{ $class->mo_ta }}</td>
-                                                <td class="text-center">{{ $class->so_hoc_sinh ?? 'Chưa có' }}</td>
-
-                                                <td class="text-center">
-                                                    @if ($class->trang_thai_lop_hoc === 0)
-                                                        <span class="btn btn-sm btn-warning text-white">Kết thúc</span>
-                                                    @elseif ($class->trang_thai_lop_hoc === 1)
-                                                        <span class="btn btn-sm btn-success">Đang học</span>
-                                                    @else
-                                                        <span class="btn btn-sm btn-secondary">Không rõ</span>
-                                                    @endif
-                                                    {{-- <br>
-                                                    <span class="btn btn-sm btn-info mt-1">{{ $class->active_days }} ngày
-                                                        active</span> --}}
-                                                </td>
-                                                <td>
-                                                    <div class="dropdown">
-                                                        <button class="dropdown-toggle" type="button"
-                                                            id="dropdownMenuButton" data-bs-toggle="dropdown"
-                                                            aria-expanded="false">
-                                                            ⚙️
-                                                        </button>
-                                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                            <li><a class="dropdown-item"
-                                                                    href="{{ route('class.students', ['id' => $class->sap_xep]) }}">📋
-                                                                    Danh sách học sinh</a></li>
-                                                            <li><a class="dropdown-item"
-                                                                    href="{{ route('class.edit', ['id' => $class->sap_xep]) }}">✏️
-                                                                    Sửa</a></li>
-                                                            <li><a class="dropdown-item" href="#">📊 Xem báo cáo kết quả
-                                                                    học
-                                                                    tập</a></li>
-                                                            <li>
-                                                                <a href="#" class="dropdown-item text-danger"
-                                                                    onclick="event.preventDefault(); if(confirm('Bạn có chắc chắn muốn xóa lớp này?')) document.getElementById('delete-form-{{ $class->sap_xep }}').submit();">
-                                                                    🗑️ Xóa
-                                                                </a>
-                                                                <form id="delete-form-{{ $class->sap_xep }}"
-                                                                    action="{{ route('class.destroy', ['id' => $class->sap_xep]) }}"
-                                                                    method="POST" style="display: none;">
-                                                                    @csrf
-                                                                    @method('DELETE')
-                                                                </form>
-                                                            </li>
-
-                                                        </ul>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-
-
-                                    </tbody>
-                                </table>
+                                <div class="filter-group">
+                                    <label for="to_date">Đến ngày:</label>
+                                    <input type="date" id="to_date" name="to_date" value="{{ request('to_date') }}">
+                                </div>
+                                <button type="submit" class="btn btn-primary">Lọc</button>
+                                <button type="reset" class="btn btn-primary">Xóa</button>
+                            </form> --}}
+                            <div id="messageError" class="w-100">
                             </div>
                         </div>
+                        <div class="table-responsive2">
+                            <table class="">
+                                <thead class="">
+                                    <tr>
+                                        {{-- <th scope="col" style="width: 5%;"><input type="checkbox" class="form-check-input"></th> --}}
+                                        <th scope="col" style="width: 5%;">STT</th>
+                                        <th scope="col" style="width: 5%;">Mã lớp</th>
+                                        <th scope="col" style="width: 10%;">Tên lớp</th>
+                                        <th scope="col" style="width: 10%;">Thuộc trung tâm</th>
+                                        <th scope="col">Lịch học</th>
+                                        <th scope="col" style="width: 7%;">Mô tả</th>
+                                        <th scope="col" style="width: 10%;">Số học sinh</th>
+                                        <th scope="col">Trạng thái</th>
+                                        <th scope="col" style="width: 5%;"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="body-schedules">
+                                    @foreach ($classes as $index => $class)
+                                        <tr>
+                                            <td>{{ $index + 1 }}</td>
+                                            <td>{{ $class->ma_lop }}</td>
+                                            <td><span class="btn btn-sm btn-danger text-white">{{ $class->ten_lop }}</span></td>
+                                            <td><strong>TIPY STEM - Thanh Hóa</strong></td>
+                                            <td>
+                                                <span class="btn btn-sm btn-info text-white">{{ $class->lich_hoc }}</span>
+                                            </td>
+
+                                            <td>{{ $class->mo_ta }}</td>
+                                            <td class="text-center">{{ $class->so_hoc_sinh ?? 'Chưa có' }}</td>
+
+                                            <td class="text-center">
+                                                @if ($class->trang_thai_lop_hoc === 0)
+                                                    <span class="btn btn-sm btn-warning text-white">Kết thúc</span>
+                                                @elseif ($class->trang_thai_lop_hoc === 1)
+                                                    <span class="btn btn-sm btn-success">Đang học</span>
+                                                @else
+                                                    <span class="btn btn-sm btn-secondary">Không rõ</span>
+                                                @endif
+                                                {{-- <br>
+                                                <span class="btn btn-sm btn-info mt-1">{{ $class->active_days }} ngày
+                                                    active</span> --}}
+                                            </td>
+                                            <td>
+                                                <div class="dropdown">
+                                                    <button class="dropdown-toggle" type="button"
+                                                        id="dropdownMenuButton" data-bs-toggle="dropdown"
+                                                        aria-expanded="false">
+                                                        ⚙️
+                                                    </button>
+                                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                        <li><a class="dropdown-item"
+                                                                href="{{ route('class.students', ['id' => $class->sap_xep]) }}">📋
+                                                                Danh sách học sinh</a></li>
+                                                        <li><a class="dropdown-item"
+                                                                href="{{ route('class.edit', ['id' => $class->sap_xep]) }}">✏️
+                                                                Sửa</a></li>
+                                                        <li><a class="dropdown-item" href="#">📊 Xem báo cáo kết quả
+                                                                học
+                                                                tập</a></li>
+                                                        <li>
+                                                            <a href="#" class="dropdown-item text-danger"
+                                                                onclick="event.preventDefault(); if(confirm('Bạn có chắc chắn muốn xóa lớp này?')) document.getElementById('delete-form-{{ $class->sap_xep }}').submit();">
+                                                                🗑️ Xóa
+                                                            </a>
+                                                            <form id="delete-form-{{ $class->sap_xep }}"
+                                                                action="{{ route('class.destroy', ['id' => $class->sap_xep]) }}"
+                                                                method="POST" style="display: none;">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                            </form>
+                                                        </li>
+
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+
+
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-            </section>
-        </main>
+                </div>
+        </section>
 
         <script>
             document.addEventListener('DOMContentLoaded', function() {

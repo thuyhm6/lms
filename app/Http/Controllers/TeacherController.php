@@ -653,7 +653,7 @@ class TeacherController extends Controller
 public function homeworks(Request $request) 
 {
     // Log thông tin request để debug
-    \Log::info('Homework creation request', [
+    Log::info('Homework creation request', [
         'user_id' => Auth::id(),
         'request_data' => $request->except(['assignment_file']),
         'file_info' => $request->hasFile('assignment_file') ? [
@@ -666,7 +666,7 @@ public function homeworks(Request $request)
     try {
         // 1. Check authentication
         if (!Auth::check()) {
-            \Log::error('Homework creation failed: User not authenticated');
+            Log::error('Homework creation failed: User not authenticated');
             return response()->json([
                 'success' => false,
                 'message' => 'Bạn cần đăng nhập để thực hiện chức năng này',
@@ -676,7 +676,7 @@ public function homeworks(Request $request)
 
         // 2. Check if schedule_id exists
         if (!$request->has('schedule_id') || empty($request->schedule_id)) {
-            \Log::error('Homework creation failed: Missing schedule_id', [
+            Log::error('Homework creation failed: Missing schedule_id', [
                 'request_data' => $request->all()
             ]);
             return response()->json([
@@ -693,7 +693,7 @@ public function homeworks(Request $request)
             ->exists();
 
         if (!$scheduleExists) {
-            \Log::error('Homework creation failed: Invalid schedule_id', [
+            Log::error('Homework creation failed: Invalid schedule_id', [
                 'schedule_id' => $request->schedule_id,
                 'teacher_id' => Auth::id()
             ]);
@@ -707,7 +707,7 @@ public function homeworks(Request $request)
         // 4. Check if homework already exists for this schedule
         $existingHomework = Homework::where('schedule_session_id', $request->schedule_id)->first();
         if ($existingHomework) {
-            \Log::warning('Homework creation failed: Homework already exists', [
+            Log::warning('Homework creation failed: Homework already exists', [
                 'schedule_id' => $request->schedule_id,
                 'existing_homework_id' => $existingHomework->id
             ]);
@@ -739,7 +739,7 @@ public function homeworks(Request $request)
         ]);
 
         if ($validator->fails()) {
-            \Log::error('Homework validation failed', [
+            Log::error('Homework validation failed', [
                 'errors' => $validator->errors()->toArray(),
                 'request_data' => $request->except(['assignment_file'])
             ]);
@@ -754,7 +754,7 @@ public function homeworks(Request $request)
         // 6. Check file upload errors
         $file = $request->file('assignment_file');
         if (!$file) {
-            \Log::error('Homework creation failed: No file received');
+            Log::error('Homework creation failed: No file received');
             return response()->json([
                 'success' => false,
                 'message' => 'Không nhận được file upload',
@@ -763,7 +763,7 @@ public function homeworks(Request $request)
         }
 
         if (!$file->isValid()) {
-            \Log::error('Homework creation failed: Invalid file upload', [
+            Log::error('Homework creation failed: Invalid file upload', [
                 'file_error' => $file->getError(),
                 'file_error_message' => $file->getErrorMessage()
             ]);
@@ -778,7 +778,7 @@ public function homeworks(Request $request)
         // 7. Check file size manually (additional check)
         $maxFileSize = 52428800; // 50MB in bytes
         if ($file->getSize() > $maxFileSize) {
-            \Log::error('Homework creation failed: File too large', [
+            Log::error('Homework creation failed: File too large', [
                 'file_size' => $file->getSize(),
                 'max_size' => $maxFileSize,
                 'file_name' => $file->getClientOriginalName()
@@ -799,7 +799,7 @@ public function homeworks(Request $request)
                 if (!mkdir($uploadPath, 0755, true)) {
                     throw new \Exception('Cannot create upload directory');
                 }
-                \Log::info('Created upload directory', ['path' => $uploadPath]);
+                Log::info('Created upload directory', ['path' => $uploadPath]);
             }
 
             // Check directory permissions
@@ -807,7 +807,7 @@ public function homeworks(Request $request)
                 throw new \Exception('Upload directory is not writable');
             }
         } catch (\Exception $e) {
-            \Log::error('Homework creation failed: Directory creation error', [
+            Log::error('Homework creation failed: Directory creation error', [
                 'path' => $uploadPath,
                 'error' => $e->getMessage(),
                 'permissions' => substr(sprintf('%o', fileperms(dirname($uploadPath))), -4)
@@ -833,7 +833,7 @@ public function homeworks(Request $request)
         } while (file_exists($fullPath) && $counter < 100);
 
         if (file_exists($fullPath)) {
-            \Log::error('Homework creation failed: Cannot generate unique filename', [
+            Log::error('Homework creation failed: Cannot generate unique filename', [
                 'attempted_filename' => $fileName,
                 'counter' => $counter
             ]);
@@ -855,7 +855,7 @@ public function homeworks(Request $request)
                 throw new \Exception('File was not found after move operation');
             }
             
-            \Log::info('File uploaded successfully', [
+            Log::info('File uploaded successfully', [
                 'original_name' => $originalName,
                 'saved_name' => $fileName,
                 'file_size' => filesize($fullPath),
@@ -863,7 +863,7 @@ public function homeworks(Request $request)
             ]);
             
         } catch (\Exception $e) {
-            \Log::error('Homework creation failed: File move error', [
+            Log::error('Homework creation failed: File move error', [
                 'source' => $file->getPathname(),
                 'destination' => $fullPath,
                 'error' => $e->getMessage(),
@@ -899,7 +899,7 @@ public function homeworks(Request $request)
 
             DB::commit();
             
-            \Log::info('Homework created successfully', [
+            Log::info('Homework created successfully', [
                 'homework_id' => $homework->id,
                 'schedule_id' => $request->schedule_id,
                 'teacher_id' => $teacherId,
@@ -926,10 +926,10 @@ public function homeworks(Request $request)
             // Clean up uploaded file if database operation failed
             if (file_exists($fullPath)) {
                 unlink($fullPath);
-                \Log::info('Cleaned up uploaded file due to database error', ['file' => $fullPath]);
+                Log::info('Cleaned up uploaded file due to database error', ['file' => $fullPath]);
             }
             
-            \Log::error('Homework creation failed: Database error', [
+            Log::error('Homework creation failed: Database error', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
@@ -942,7 +942,7 @@ public function homeworks(Request $request)
         }
 
     } catch (\Exception $e) {
-        \Log::error('Homework creation failed: Unexpected error', [
+        Log::error('Homework creation failed: Unexpected error', [
             'error' => $e->getMessage(),
             'file' => $e->getFile(),
             'line' => $e->getLine(),

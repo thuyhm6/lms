@@ -56,14 +56,14 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($products as $product)
+                        @foreach($products as $key => $product)
                         <tr>
-                            <td>{{ $product->id }}</td>
-                            <td class="pname">
-                                <div class="image">
+                            <td>{{ $products->firstItem() + $key }}</td>
+                            <td class="d-flex align-items-center">
+                                <div class="item">
                                     <img src="{{ asset('uploads/products/thumbnails') }}/{{ $product->image }}" alt="{{ $product->name }}" class="image">
                                 </div>
-                                <div class="name">
+                                <div class="item">
                                     <a href="{{ route('admin.product.view',['id'=>$product->id]) }}" class="body-title-2">{{ $product->name }}</a>
                                     <div class="text-tiny mt-3">{{ $product->slug }}</div>
                                 </div>
@@ -83,7 +83,7 @@
                                             <i class="icon-eye"></i>
                                         </div>
                                     </a>
-                                    <a href="{{ route('admin.parent.edit', ['id'=>$product->id]) }}">
+                                    <a href="{{ route('admin.product.edit', ['id'=>$product->id]) }}">
                                         <div class="item edit">
                                             <i class="icon-edit-3"></i>
                                         </div>

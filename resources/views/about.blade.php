@@ -1,45 +1,255 @@
 @extends('layouts.app') {{-- //Cần check chỗ này --}}
 @section('title', 'Về chúng tôi')
 @section('content')
-<main class="pt-90">
-    <div class="mb-4 pb-4"></div>
-    <section class="contact-us container">
-      <div class="mw-930">
-        <h2 class="page-title">About US</h2>
+  <header class="page-header wow fadeInUp" data-wow-delay="0.5s" data-background="img/about-us.jpg">
+    <div class="container">
+      <h2>About Us</h2>
+      <div class="bosluk3"></div>
+      <p><a href="index-2.html">Home</a> <i class="flaticon-right-chevron"></i> About Us</p>
+    </div>
+    <!-- end container --> 
+  </header>
+  <!--About Top-->
+  <section class="services-top">
+    <div class="bosluk3"></div>
+    <div class="tablo">
+        <div class="tablo--1-ve-2 wow slideInUp" data-wow-delay="0.3s">
+            <div class="galeri">
+                <img src="{{ asset('images/about-us/about-us.jpg') }}" alt="life hotel about" class="galeri__gorsel galeri__gorsel--3 zimage">
+            </div>
+        </div>           
+        <!--Galeri Görsel Alanı-->
+        <div class="tablo--1-ve-3 wow fadeInRight" data-wow-delay="0.4s">
+                <h2 class="h2-baslik-anasayfa-ozel1 wow fadeInRight" data-wow-delay="0.5s"><strong>Đôi nét về chúng tôi</strong></h2>
+                <div class="bosluk333"></div>
+                <p class="paragraf wow fadeInRight" data-wow-delay="0.6s">
+                Trung tâm Sáng tạo Công nghệ 8-bit là đơn vị đầu tiên tại Thanh Hóa đào tạo công nghệ, lập trình và AI cho trẻ em. Mỗi học viên tại trung tâm đều được lộ trình hóa cá nhân, giúp các bé khai mở tiềm năng, phát triển đúng năng lực cá nhân. Với đội ngũ giảng viên giàu kinh nghiệm, chuyên môn sâu, và chương trình học bài bản, giúp các con phát huy các điểm mạnh cá nhân và định hướng nghề nghiệp cho trẻ trong tương lai.
+                </p>
+                  <div class="bosluk333"></div>
+                <img class="divider" width="120" height="15" title="divider" alt="divider" src="img/divider.jpg">
+                <div class="bosluk333"></div>
+                <div class="row">
+                    <div class="col-sm-2 wow fadeInRight" data-wow-delay="0.7s">
+                        <div class="iconleft"><i class="flaticon-hotel-room"></i></div>
+                    </div>
+                    <div class="col-sm-10 wow fadeInRight" data-wow-delay="0.8s">
+                        <h3 class="baslik-3s h-yazi-margin-kucuk1">Cở sở vật chất hiện đại</h3><br>
+                        <p class="paragraf-info">Cơ sở vật chất hiện đại.</p><br>
+                    </div>
+                </div>
+                <div class="bosluk1"></div>
+                <div class="row">
+                    <div class="col-sm-2 wow fadeInRight" data-wow-delay="1.1s">
+                        <div class="iconleft"><i class="flaticon-check-in"></i></div>
+                    </div>
+                    <div class="col-sm-10 wow fadeInRight" data-wow-delay="1.2s">
+                        <h3 class="baslik-3s h-yazi-margin-kucuk1">Đội ngũ giáo viên giàu kinh  nghiệm</h3><br>
+                        <p class="paragraf-info">Đội ngữ giáo viên giàu kinh nghiệm.</p><br>
+                    </div>
+                </div>
+                  <div class="bosluk3rh"></div>
+            </div>
+    </div>  
+</section>
+<!--Count-->
+<section class="count-alani">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-3 col-md-6 wow fadeInLeft" data-wow-delay="0.5s">
+          <div class="iconw"><i class="flaticon-family-room"></i></div>
+        <div class="counter-box wow fade">
+          <span class="odometer" data-count="851" data-status="yes">0</span>
+          <h6>Học sinh</h6>
+        </div>
       </div>
-
-      <div class="about-us__content pb-5 mb-5">
-        <p class="mb-5">
-          <img loading="lazy" class="w-100 h-auto d-block" src="assets/images/about/about-1.jpg" width="1410"
-            height="550" alt="" />
-        </p>
-        <div class="mw-930">
-          <h3 class="mb-4">Câu chuyện của chúng tôi</h3>
-          <p class="fs-6 fw-medium mb-4">Chúng tôi bắt đầu từ một quầy kem nhỏ trên góc phố, nơi từng viên kem không chỉ mang hương vị ngọt ngào mà còn chứa đựng cả đam mê và ước mơ lớn.</p>
-          <p class="mb-4">Từ những ngày đầu tự tay làm kem, thử nghiệm từng công thức đến khi xây dựng thương hiệu, chúng tôi luôn giữ vững tinh thần sáng tạo và chất lượng. Hành trình từ một cửa hàng nhỏ đến một doanh nghiệp phát triển hôm nay là minh chứng cho sự kiên trì, đổi mới và cam kết mang đến sản phẩm tốt nhất cho khách hàng.</p>
-          <div class="row mb-3">
-            <div class="col-md-6">
-              <h5 class="mb-3">Sứ mệnh của chúng tôi</h5>
-              <p class="mb-3">Chúng tôi cam kết mang đến những sản phẩm chất lượng, không chỉ làm hài lòng vị giác mà còn tạo nên những khoảnh khắc đáng nhớ. Sứ mệnh của chúng tôi là kết nối con người qua những trải nghiệm hương vị độc đáo, đồng thời không ngừng cải tiến để đáp ứng nhu cầu của thị trường.</p>
-            </div>
-            <div class="col-md-6">
-              <h5 class="mb-3">Tầm nhìn của chúng tôi</h5>
-              <p class="mb-3">Trở thành thương hiệu dẫn đầu trong ngành thực phẩm & đồ uống, không chỉ với sản phẩm ngon mà còn với sự sáng tạo và giá trị cộng đồng. Chúng tôi hướng tới việc mở rộng quy mô, đưa sản phẩm đến nhiều thị trường hơn và trở thành lựa chọn tin cậy cho khách hàng ở mọi nơi.</p>
-            </div>
+      <!-- end col-4 -->
+      <div class="col-lg-3 col-md-6 wow fadeInLeft" data-wow-delay="0.6s">
+          <div class="iconw"><i class="flaticon-hotel-room"></i></div>
+        <div class="counter-box wow fade">
+          <span class="odometer" data-count="389" data-status="yes">0</span>
+          <h6>Phòng học</h6>
+        </div>
+      </div>
+      <!-- end col-4 -->
+      <div class="col-lg-3 col-md-6 wow fadeInRight" data-wow-delay="0.7s">
+          <div class="iconw"><i class="flaticon-hotel-staff"></i></div>
+        <div class="counter-box wow fade">
+          <span class="odometer" data-count="2462" data-status="yes">0</span>
+          <h6>Giáo viên</h6>
+        </div>
+      </div>
+      <!-- end col-4 -->
+      <div class="col-lg-3 col-md-6 wow fadeInRight" data-wow-delay="0.8s">
+          <div class="iconw"><i class="flaticon-room-service"></i></div>
+          <div class="counter-box wow fade">
+            <span class="odometer" data-count="20" data-status="yes">0</span>
+            <h6>Khóa học</h6>
           </div>
         </div>
-        <div class="mw-930 d-lg-flex align-items-lg-center">
-          <div class="image-wrapper col-lg-6">
-            <img class="h-auto" loading="lazy" src="assets/images/about/about-1.jpg" width="450" height="500" alt="">
+        <!-- end col-4 -->  
+    </div>
+  </div>
+</section>
+    <div class="bosluk3sh"></div>
+    <!--TITLE-->
+    <section class="ozellika wow fadeInUp" data-wow-delay="0.3s" data-background="rgb(26 26 26 / 29%)">
+      <div class="container">
+          <div class="row align-items-center no-gutters">
+              <div class="col-lg-12">
+                  <div class="wow fade">
+                      <div class="boslukalt"></div>
+                      <h2 class="h2-baslik-hizmetler-212 wow fade"><strong>Đội ngũ </strong> </h2>  
+                  </div>
+              </div>
           </div>
-          <div class="content-wrapper col-lg-6 px-lg-4">
-            <h5 class="mb-3">Công ty của chúng tôi</h5>
-            <p>Chúng tôi không chỉ là một doanh nghiệp, mà còn là một cộng đồng của những con người yêu thích hương vị và sự đổi mới. Với đội ngũ giàu nhiệt huyết, cùng hệ thống sản xuất và phân phối chuyên nghiệp, chúng tôi đang từng bước hiện thực hóa tầm nhìn của mình – mang sản phẩm chất lượng đến với nhiều người hơn, theo cách bền vững và sáng tạo nhất.</p>
-          </div>
-        </div>
       </div>
+  </section>    
+    <!--Team Alanı-->
+    <section class="team-section">
+      <div class="container">
+        <div class="row">
+            <div class="col-12">
+            <div class="carousel-classes">
+              <div class="swiper-wrapper">
+                <div class="swiper-slide">
+                    <div class="class-box">
+                      <div class="services-kutu2 wow fadeInLeft" data-wow-delay="0.4s" style="cursor:pointer;">
+                          <div class="member-box wow reveal-effect">
+                              <figure> <img src="img/team1.png" alt="Image">
+                                <figcaption>
+                                  <h6>Lê Minh Đức</h6>
+                                  <p class="paragraf-sol-beyaz-orta">CEO</p>
+                                </figcaption>
+                              </figure>
+                            </div>
+                          </div>
+                        </div>
+                        </div>
+                  <!-- end swiper-slide -->
+                <div class="swiper-slide">
+                    <div class="class-box">
+                      <div class="services-kutu2 wow fadeInLeft" data-wow-delay="0.5s" style="cursor:pointer;">
+                          <div class="member-box wow reveal-effect">
+                              <figure> <img src="img/team2.png" alt="Image">
+                                <figcaption>
+                                  <h6>Khánh Huyền</h6>
+                                  <p class="paragraf-sol-beyaz-orta">Thành phần chính</p>
+                                </figcaption>
+                              </figure>
+                          </div>
+                      </div>
+                    </div>
+                </div>
+                  <!-- end swiper-slide -->
+                <div class="swiper-slide">
+                    <div class="class-box">
+                      <div class="services-kutu2 wow fadeInRight" data-wow-delay="0.6s" style="cursor:pointer;">
+                          <div class="member-box wow reveal-effect">
+                              <figure> <img src="img/team3.png" alt="Image">
+                                <figcaption>
+                                  <h6>Thành Anh</h6>
+                                  <p class="paragraf-sol-beyaz-orta">Thành phần cộm cán</p>
+                                </figcaption>
+                              </figure>
+                          </div>
+                      </div>
+                    </div>
+                </div>
+                  <!-- end swiper-slide -->
+              </div>
+                <!-- end swiper-wrapper -->
+                <div class="swiper-pagination"></div>
+                <!-- end swiper-pagination -->
+              </div>
+          </div>
+      </div>
+  </div>
     </section>
-
-
-  </main>
+  <!--Yorumlar-->
+  <section class="yorumlar-alani-sayfa">
+<div class="container">
+    <div class="row">
+    <div class="col-12">
+        <div class="h-yazi-ortalama h-yazi-margin-orta-3">
+            <h2 class="h2-baslik-hizmetler-2 wow fadeInUp" data-wow-delay="0.4s">Phụ huynh và học sinh<strong> Nói Gì Về Chúng Tôi</strong> </h2>
+        </div>
+        {{-- <div class="bosluk3ps"></div> --}}
+    </div>
+        <div class="col-12">
+        <div class="carousel-classes">
+                <div class="swiper-wrapper">
+            <div class="swiper-slide wow fadeInLeft" data-wow-delay="0.5s">
+                <div class="class-box">
+                <div class="testimonial-card">
+                    <div class="testimon-text">
+                        Học ở 8 Bit rất tốt.
+                        <i class="fas fa-quote-right quote"></i>
+                    </div>
+                    <div class="testimonialimg">
+                        <div class="testimonimg"><img src="img/testimonial1.png" alt="">
+                        </div>
+                        <h3 class='person'>Thành Anh</h3>
+                    </div>
+                    </div>
+                    </div>
+                    </div>
+                    <!-- end swiper-slide -->
+            <div class="swiper-slide wow fadeInLeft" data-wow-delay="0.6s">
+                <div class="class-box">
+                <div class="testimonial-card">
+                    <div class="testimon-text">
+                        Học ở 8 Bit rất tốt.
+                        <i class="fas fa-quote-right quote"></i>
+                    </div>
+                    <div class="testimonialimg">
+                        <div class="testimonimg"><img src="img/testimonial2.png" alt="">
+                        </div>
+                        <h3 class='person'>Mỹ Linh</h3>
+                    </div>
+                    </div>
+                </div>
+                    </div>
+                    <!-- end swiper-slide -->
+            <div class="swiper-slide wow fadeInRight" data-wow-delay="0.7s">
+                <div class="class-box">
+                <div class="testimonial-card">
+                    <div class="testimon-text">
+                        Học ở 8 Bit rất tốt.
+                        <i class="fas fa-quote-right quote"></i>
+                    </div>
+                    <div class="testimonialimg">
+                        <div class="testimonimg"><img src="img/testimonial3.png" alt="">
+                        </div>
+                        <h3 class='person'>Duyên</h3>
+                    </div>
+                    </div>
+                </div>
+                    </div>
+                    <!-- end swiper-slide -->
+            <div class="swiper-slide wow fadeInRight" data-wow-delay="0.8s">
+                <div class="class-box">
+                <div class="testimonial-card">
+                    <div class="testimon-text">
+                        Học ở 8 Bit rất tốt.
+                        <i class="fas fa-quote-right quote"></i>
+                    </div>
+                    <div class="testimonialimg">
+                        <div class="testimonimg"><img src="img/testimonial4.png" alt="">
+                        </div>
+                        <h3 class='person'>Huyền</h3>
+                    </div>
+                    </div>
+                    </div>
+                    </div>
+                    <!-- end swiper-slide -->
+            </div>
+            <!-- end swiper-wrapper -->
+            <div class="swiper-pagination"></div>
+            <!-- end swiper-pagination -->
+            </div>
+        </div>
+        <!-- end col-12 -->
+    </div>
+</div>
+</section>
 @endsection

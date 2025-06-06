@@ -1,371 +1,499 @@
 @extends('layouts.app') {{-- //Cần check chỗ này --}}
 @section('title', 'Trang chủ')
 @section('content')
-<main>
-
-    <section class="swiper-container js-swiper-slider swiper-number-pagination slideshow" data-settings='{
-        "autoplay": {
-          "delay": 5000
-        },
-        "slidesPerView": 1,
-        "effect": "fade",
-        "loop": true
-      }'>
-      <div class="swiper-wrapper">
-        @foreach ($slides as $slide)
+  <header class="slider">
+    <div class="main-slider">
+    <div class="swiper-wrapper">
+      @foreach ($slides as $slide)
         <div class="swiper-slide">
-          <div class="overflow-hidden position-relative h-100">
-            <div class="slideshow-character position-absolute bottom-0 pos_right-center">
-              <img loading="lazy" src="{{ asset('uploads/slides')}}/{{ $slide->image }}" width="542" height="733"
-                alt="Woman Fashion 1"
-                class="slideshow-character__img animate animate_fade animate_btt animate_delay-9 w-auto h-auto" />
-              <div class="character_markup type2">
-                <p class="text-uppercase font-sofia mark-grey-color animate animate_fade animate_btt animate_delay-10 mb-0">
-                  {{ $slide->tagline }}
-                </p>
-              </div>
+            <div class="slide-image" data-background="{{ asset('uploads/slides')}}/{{ $slide->image }}"></div>
+            <div class="container">
+                <h1><span style="font-size:40px;">{{ $slide->title }}</h1>
+                <p>{{ $slide->subtitle }}</p>
+                <div class="ortabuton"> <a href="#">{{ $slide->link }}</a></div> 
             </div>
-            <div class="slideshow-text container position-absolute start-50 top-50 translate-middle">
-              <h6 class="text_dash text-uppercase fs-base fw-medium animate animate_fade animate_btt animate_delay-3">
-                Sản phẩm mới
-              </h6>
-              <h2 class="h1 fw-normal mb-0 animate animate_fade animate_btt animate_delay-5">{{ $slide->title }}</h2>
-              <h2 class="h1 fw-bold animate animate_fade animate_btt animate_delay-5">{{ $slide->subtitle }}</h2>
-              <a href="{{ $slide->link }}" class="btn-link btn-link_lg default-underline fw-medium animate animate_fade animate_btt animate_delay-7">Mua ngay</a>
-            </div>
-          </div>
         </div>
-        @endforeach
-
-      </div>
-
-      <div class="container">
-        <div
-          class="slideshow-pagination slideshow-number-pagination d-flex align-items-center position-absolute bottom-0 mb-5">
+      @endforeach
+        
+        <!-- end container --> 
         </div>
-      </div>
-    </section>
-    <div class="container mw-1620 bg-white border-radius-10">
-      <div class="mb-3 mb-xl-5 pt-1 pb-4"></div>
-      <section class="category-carousel container">
-        <h2 class="section-title text-center mb-3 pb-xl-2 mb-xl-4">You Might Like</h2>
-
-        <div class="position-relative">
-          <div class="swiper-container js-swiper-slider" data-settings='{
-              "autoplay": {
-                "delay": 5000
-              },
-              "slidesPerView": 8,
-              "slidesPerGroup": 1,
-              "effect": "none",
-              "loop": true,
-              "navigation": {
-                "nextEl": ".products-carousel__next-1",
-                "prevEl": ".products-carousel__prev-1"
-              },
-              "breakpoints": {
-                "320": {
-                  "slidesPerView": 2,
-                  "slidesPerGroup": 2,
-                  "spaceBetween": 15
-                },
-                "768": {
-                  "slidesPerView": 4,
-                  "slidesPerGroup": 4,
-                  "spaceBetween": 30
-                },
-                "992": {
-                  "slidesPerView": 6,
-                  "slidesPerGroup": 1,
-                  "spaceBetween": 45,
-                  "pagination": false
-                },
-                "1200": {
-                  "slidesPerView": 8,
-                  "slidesPerGroup": 1,
-                  "spaceBetween": 60,
-                  "pagination": false
-                }
-              }
-            }'>
-            <div class="swiper-wrapper">
-              @foreach ($categories as $category)
-              <a href="{{ route('shop.index',['categories'=>$category->id]) }}">
-                <div class="swiper-slide">
-                  <img loading="lazy" class="w-100 h-auto mb-3 rounded-circle" src="{{ asset('uploads/categories')}}/{{ $category->image }}" width="124"
-                    height="124" alt="" />
-                  <div class="text-center">
-                    <a href="{{ route('shop.index',['categories'=>$category->id]) }}" class="menu-link fw-medium">{{ $category->name }}</a>
-                  </div>
-                </div>
-              </a>
-              @endforeach
-              
-            </div><!-- /.swiper-wrapper -->
-          </div><!-- /.swiper-container js-swiper-slider -->
-
-          <div
-            class="products-carousel__prev products-carousel__prev-1 position-absolute top-50 d-flex align-items-center justify-content-center">
-            <svg width="25" height="25" viewBox="0 0 25 25" xmlns="http://www.w3.org/2000/svg">
-              <use href="#icon_prev_md" />
-            </svg>
-          </div><!-- /.products-carousel__prev -->
-          <div
-            class="products-carousel__next products-carousel__next-1 position-absolute top-50 d-flex align-items-center justify-content-center">
-            <svg width="25" height="25" viewBox="0 0 25 25" xmlns="http://www.w3.org/2000/svg">
-              <use href="#icon_next_md" />
-            </svg>
-          </div><!-- /.products-carousel__next -->
-        </div><!-- /.position-relative -->
-      </section>
-
-      <div class="mb-3 mb-xl-5 pt-1 pb-4"></div>
-
-      <section class="hot-deals container">
-        <h2 class="section-title text-center mb-3 pb-xl-3 mb-xl-4">Hot Deals</h2>
-        <div class="row">
-          <div
-            class="col-md-6 col-lg-4 col-xl-20per d-flex align-items-center flex-column justify-content-center py-4 align-items-md-start">
-            <h2>Summer Sale</h2>
-            <h2 class="fw-bold">Up to 60% Off</h2>
-
-            <div class="position-relative d-flex align-items-center text-center pt-xxl-4 js-countdown mb-3"
-              data-date="18-3-2024" data-time="06:50">
-              <div class="day countdown-unit">
-                <span class="countdown-num d-block"></span>
-                <span class="countdown-word text-uppercase text-secondary">Days</span>
-              </div>
-
-              <div class="hour countdown-unit">
-                <span class="countdown-num d-block"></span>
-                <span class="countdown-word text-uppercase text-secondary">Hours</span>
-              </div>
-
-              <div class="min countdown-unit">
-                <span class="countdown-num d-block"></span>
-                <span class="countdown-word text-uppercase text-secondary">Mins</span>
-              </div>
-
-              <div class="sec countdown-unit">
-                <span class="countdown-num d-block"></span>
-                <span class="countdown-word text-uppercase text-secondary">Sec</span>
-              </div>
-            </div>
-
-            <a href="{{ route('shop.index') }}" class="btn-link default-underline text-uppercase fw-medium mt-3">View All</a>
-          </div>
-          <div class="col-md-6 col-lg-8 col-xl-80per">
-            <div class="position-relative">
-              <div class="swiper-container js-swiper-slider" data-settings='{
-                  "autoplay": {
-                    "delay": 5000
-                  },
-                  "slidesPerView": 4,
-                  "slidesPerGroup": 4,
-                  "effect": "none",
-                  "loop": false,
-                  "breakpoints": {
-                    "320": {
-                      "slidesPerView": 2,
-                      "slidesPerGroup": 2,
-                      "spaceBetween": 14
-                    },
-                    "768": {
-                      "slidesPerView": 2,
-                      "slidesPerGroup": 3,
-                      "spaceBetween": 24
-                    },
-                    "992": {
-                      "slidesPerView": 3,
-                      "slidesPerGroup": 1,
-                      "spaceBetween": 30,
-                      "pagination": false
-                    },
-                    "1200": {
-                      "slidesPerView": 4,
-                      "slidesPerGroup": 1,
-                      "spaceBetween": 30,
-                      "pagination": false
-                    }
-                  }
-                }'>
-                <div class="swiper-wrapper">
-                  @foreach ($sproducts as $sproduct)
-                  <div class="swiper-slide product-card product-card_style3">
-                    <div class="pc__img-wrapper">
-                      <a href="{{ route('shop.product.details',['product_slug'=>$sproduct->slug]) }}">
-                        <img loading="lazy" src="{{ asset('uploads/products')}}\{{ $sproduct->image }}" width="258" height="313"
-                          alt="{{ $sproduct->name }}" class="pc__img">
-                      </a>
-                    </div>
-
-                    <div class="pc__info position-relative">
-                      <h6 class="pc__title"><a href="{{ route('shop.product.details',['product_slug'=>$sproduct->slug]) }}">{{ $sproduct->name }}</a></h6>
-                      <div class="product-card__price d-flex">
-                        <span class="money price text-secondary">
-                          @if ($sproduct->sale_price)
-                            <s>{{ $sproduct->regular_price }}</s> {{ $sproduct->sale_price }}
-                          @else
-                              {{ $sproduct->regular_price }}
-                          @endif
-                        </span>
-                      </div>
-
-                      <div class="anim_appear-bottom position-absolute bottom-0 start-0 d-none d-sm-flex align-items-center bg-body">
-                        {{-- <button class="btn-link btn-link_lg me-4 text-uppercase fw-medium js-add-cart js-open-aside" data-aside="cartDrawer" title="Add To Cart">Add To Cart</button> --}}
-                        @if (Cart::instance('cart')->content()->where('id',$sproduct->id)->count() > 0)
-                          <a href="{{ route('cart.index') }}" class="btn-link btn-link_lg me-4 text-uppercase fw-medium js-add-cart">Go to Cart</a>
-                        @else
-                        <form action="{{ route('cart.add') }}" name="addtocart-form" method="POST">
-                          @csrf
-                          {{-- <div class="product-single__addtocart"> --}}
-                            <input type="hidden" name="id" value="{{ $sproduct->id }}">
-                            <input type="hidden" name="name" value="{{ $sproduct->name }}">
-                            <input type="hidden" name="quantity" value="1">
-                            <input type="hidden" name="price" value="{{ $sproduct->sale_price == '' ? $sproduct->regular_price : $sproduct->sale_price}}">
-                            <button class="btn-link btn-link_lg me-4 text-uppercase fw-medium js-add-cart" data-aside="cartDrawer" title="Add To Cart">Add To Cart</button>
-                            {{-- <button class="pc__atc btn anim_appear-bottom btn position-absolute border-0 text-uppercase fw-medium" data-aside="cartDrawer" title="Add To Cart">Add To Cart</button> --}}
-                          {{-- </div> --}}
-                        </form>
-                        @endif
-
-                        <button class="btn-link btn-link_lg me-4 text-uppercase fw-medium js-quick-view" data-bs-toggle="modal" data-bs-target="#quickView" title="Quick view">
-                          <span class="d-none d-xxl-block">Quick View</span>
-                          <span class="d-block d-xxl-none">
-                            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"> <use href="#icon_view" /></svg>
-                          </span>
-                        </button>
-
-                        {{-- <button class="pc__btn-wl bg-transparent border-0 js-add-wishlist" title="Add To Wishlist">
-                          <svg width="16" height="16" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <use href="#icon_heart" />
-                          </svg>
-                        </button> --}}
-
-                        @if (Cart::instance('wishlist')->content()->where('id', $sproduct->id)->count() > 0)
-                          <form action="{{ route('wishlist.remove', ['rowId'=>Cart::instance('wishlist')->content()->where('id', $sproduct->id)->first()->rowId]) }}" method="post">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="pc__btn-wl bg-transparent border-0 js-add-wishlist" title="Remove From Wishlist">
-                              <svg width="16" height="16" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <use href="#icon_heart" />
-                              </svg>
-                            </button>
-                          </form>
-                        @else
-                        <form action="{{ route('wishlist.add') }}" method="post">
-                          @csrf
-                          <input type="hidden" name="id" value="{{ $sproduct->id }}">
-                          <input type="hidden" name="name" value="{{ $sproduct->name }}">
-                          <input type="hidden" name="quantity" value="1">
-                          <input type="hidden" name="price" value="{{ $sproduct->sale_price == '' ? $sproduct->regular_price : $sproduct->sale_price}}">
-                          <button type="submit" class="pc__btn-wl bg-transparent border-0 js-add-wishlist" title="Add To Wishlist">
-                            <svg width="16" height="16" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                              <use href="#icon_heart" />
-                            </svg>
-                          </button>
-                        </form>
-                        @endif
-                      </div>
-                    </div>
-                  </div>
-                  @endforeach
-                </div><!-- /.swiper-wrapper -->
-              </div><!-- /.swiper-container js-swiper-slider -->
-            </div><!-- /.position-relative -->
-          </div>
-        </div>
-      </section>
-
-      <div class="mb-3 mb-xl-5 pt-1 pb-4"></div>
-
-      <section class="category-banner container">
-        <div class="row">
-          <div class="col-md-6">
-            <div class="category-banner__item border-radius-10 mb-5">
-              <img loading="lazy" class="h-auto" src="{{ asset('assets/images/home/demo3/category_9.jpg')}}" width="690" height="665"
-                alt="" />
-              <div class="category-banner__item-mark">
-                Starting at $19
-              </div>
-              <div class="category-banner__item-content">
-                <h3 class="mb-0">Kem ốc quế</h3>
-                <a href="#" class="btn-link default-underline text-uppercase fw-medium">Shop Now</a>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="category-banner__item border-radius-10 mb-5">
-              <img loading="lazy" class="h-auto" src="{{ asset('assets/images/home/demo3/category_10.jpg')}}" width="690" height="665"
-                alt="" />
-              <div class="category-banner__item-mark">
-                Starting at $19
-              </div>
-              <div class="category-banner__item-content">
-                <h3 class="mb-0">Kem ly</h3>
-                <a href="#" class="btn-link default-underline text-uppercase fw-medium">Shop Now</a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <div class="mb-3 mb-xl-5 pt-1 pb-4"></div>
-
-      <section class="products-grid container">
-        <h2 class="section-title text-center mb-3 pb-xl-3 mb-xl-4">Featured Products</h2>
-
-        <div class="row">
-          @foreach ($fproducts as $fproduct)
-          <div class="col-6 col-md-4 col-lg-3">
-            <div class="product-card product-card_style3 mb-3 mb-md-4 mb-xxl-5">
-              <div class="pc__img-wrapper">
-                <a href="{{ route('shop.product.details',['product_slug'=>$fproduct->slug]) }}">
-                  <img loading="lazy" src="{{ asset('uploads/products')}}/{{ $fproduct->image }}" width="330" height="400"
-                    alt="{{ $fproduct->name }}" class="pc__img">
-                </a>
-              </div>
-
-              <div class="pc__info position-relative">
-                <h6 class="pc__title"><a href="{{ route('shop.product.details',['product_slug'=>$fproduct->slug]) }}">{{ $fproduct->name }}</a></h6>
-                <div class="product-card__price d-flex align-items-center">
-                  <span class="money price text-secondary">
-                    @if ($fproduct->sale_price)
-                      <s>{{ $fproduct->regular_price }}</s> {{ $fproduct->sale_price }}
-                    @else
-                        {{ $fproduct->regular_price }}
-                    @endif
-                  </span>
-                </div>
-
-                <div class="anim_appear-bottom position-absolute bottom-0 start-0 d-none d-sm-flex align-items-center bg-body">
-                  <button class="btn-link btn-link_lg me-4 text-uppercase fw-medium js-add-cart js-open-aside" data-aside="cartDrawer" title="Add To Cart">Add To Cart</button>
-                  <button class="btn-link btn-link_lg me-4 text-uppercase fw-medium js-quick-view" data-bs-toggle="modal" data-bs-target="#quickView" title="Quick view">
-                    <span class="d-none d-xxl-block">Quick View</span>
-                    <span class="d-block d-xxl-none"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <use href="#icon_view" />
-                      </svg></span>
-                  </button>
-                  <button class="pc__btn-wl bg-transparent border-0 js-add-wishlist" title="Add To Wishlist">
-                    <svg width="16" height="16" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <use href="#icon_heart" />
-                    </svg>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-          @endforeach
-        </div><!-- /.row -->
-
-        <div class="text-center mt-2">
-          <a class="btn-link btn-link_lg default-underline text-uppercase fw-medium" href="#">Load More</a>
-        </div>
-      </section>
     </div>
+    <div class="button-prev">❮</div>
+    <div class="button-next">❯</div>
+    <div class="swiper-pagination"></div>
+    </header>
+    <!--Quality Alanı-->
+    <!--Quality 1-->
+    {{-- <div class="boslukq3"></div> --}}
+    
+    <!--Rooms-->
+    <section class="room">
+        <div class="h-yazi-ortalama h-yazi-margin-orta-3">
+            <h2 class="h2-baslik-hizmetler-2 wow fadeInUp" data-wow-delay="0.3s">KHÓA HỌC</h2>
+            <div class="bosluk333"></div>
+            <img class="divider" width="363" height="38" title="divider" alt="divider" src="img/room-divider.png">
+            <div class="bosluk333"></div>
+            <p class="h2-baslik-hizmetler-2__paragraf wow fadeInUp" data-wow-delay="0.4s">
+                Những khóa học đang triển khai tại trung tâm.
+            </p>
+        </div>
+        <div class="bosluk3"></div>
+        <div class="container">  
+            <div class="carousel-classes">
+                <div class="swiper-wrapper">
+                  @foreach ($courses->chunk(2) as $chunk)
+                    <div class="swiper-slide">
+                      @foreach ($chunk as $index => $course)
+                        <div class="pro-tabs">
+                            <div class="pro-content current wow fade">
+                                <div class="pros">
+                                    <div class="prow wow fadeInLeft" data-wow-delay="0.5s" onclick="window.location.href='room-detail.html'">
+                                        <img src="{{ asset($course->image ?? 'images/default.png') }}" alt="Room">
+                                        <div class="pro-card-content">
+                                            <h2>{{ $course->course_name }}</h2>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                      @endforeach
+                    </div>
+                  @endforeach
+                <!-- end swiper-slide -->
+            </div>
+            <!-- end swiper-wrapper -->
+            <div class="swiper-pagination"></div>
+            <!-- end swiper-pagination -->
+            </div>
+        </div> 
+    </section>
+  <!--About Top-->
+    <section class="services-top">
+        <div class="bosluk3"></div>
+        <div class="tablo">
+            <div class="tablo--1-ve-2 wow slideInUp" data-wow-delay="0.3s">
+                <div class="galeri">
+                    <img src="{{ asset('images/about-us/about-us.jpg') }}" alt="life hotel about" class="galeri__gorsel galeri__gorsel--3 zimage">
+                </div>
+            </div>           
+            <!--Galeri Görsel Alanı-->
+            <div class="tablo--1-ve-3 wow fadeInRight" data-wow-delay="0.4s">
+                <h2 class="h2-baslik-anasayfa-ozel1 wow fadeInRight" data-wow-delay="0.5s"><strong>Đôi nét về chúng tôi</strong></h2>
+                <div class="bosluk333"></div>
+                <p class="paragraf wow fadeInRight" data-wow-delay="0.6s">
+                Trung tâm Sáng tạo Công nghệ 8-bit là đơn vị đầu tiên tại Thanh Hóa đào tạo công nghệ, lập trình và AI cho trẻ em. Mỗi học viên tại trung tâm đều được lộ trình hóa cá nhân, giúp các bé khai mở tiềm năng, phát triển đúng năng lực cá nhân. Với đội ngũ giảng viên giàu kinh nghiệm, chuyên môn sâu, và chương trình học bài bản, giúp các con phát huy các điểm mạnh cá nhân và định hướng nghề nghiệp cho trẻ trong tương lai.
+                </p>
+                  <div class="bosluk333"></div>
+                <img class="divider" width="120" height="15" title="divider" alt="divider" src="img/divider.jpg">
+                <div class="bosluk333"></div>
+                <div class="row">
+                    <div class="col-sm-2 wow fadeInRight" data-wow-delay="0.7s">
+                        <div class="iconleft"><i class="flaticon-hotel-room"></i></div>
+                    </div>
+                    <div class="col-sm-10 wow fadeInRight" data-wow-delay="0.8s">
+                        <h3 class="baslik-3s h-yazi-margin-kucuk1">Cở sở vật chất hiện đại</h3><br>
+                        <p class="paragraf-info">Cơ sở vật chất hiện đại.</p><br>
+                    </div>
+                </div>
+                <div class="bosluk1"></div>
+                <div class="row">
+                    <div class="col-sm-2 wow fadeInRight" data-wow-delay="1.1s">
+                        <div class="iconleft"><i class="flaticon-check-in"></i></div>
+                    </div>
+                    <div class="col-sm-10 wow fadeInRight" data-wow-delay="1.2s">
+                        <h3 class="baslik-3s h-yazi-margin-kucuk1">Đội ngũ giáo viên giàu kinh  nghiệm</h3><br>
+                        <p class="paragraf-info">Đội ngữ giáo viên giàu kinh nghiệm.</p><br>
+                    </div>
+                </div>
+                <a href="{{ route('home.about') }}" class="custom-button wow fadeInRight" data-wow-delay="1.3s">Tìm hiểu thêm →</a>
+                  <div class="bosluk3rh"></div>
+            </div>
+        </div>  
+    </section>
 
-    <div class="mb-3 mb-xl-5 pt-1 pb-4"></div>
-
-  </main>
+                <!-- Tabs -->
+<section class="tabs">
+<div class="container">
+<div class="row">
+    <div class="col-lg-12">
+        <div class="season_tabs">
+                <div class="season_tab">
+                    <input type="radio" id="tab-1" name="tab-group-1" checked>
+                    <label for="tab-1">Về chúng tôi</label>
+                    <div class="season_content">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-lg-5">
+                                    <img src="img/about-us1.jpg" alt="">
+                                </div>
+                                <div class="col-lg-7">
+                                    <p class="listtext">
+                                        Trung tâm Sáng tạo Công nghệ 8-bit là đơn vị đầu tiên tại Thanh Hóa đào tạo công nghệ, lập trình và AI cho trẻ em. Mỗi học viên tại trung tâm đều được lộ trình hóa cá nhân, giúp các bé khai mở tiềm năng, phát triển đúng năng lực cá nhân.
+                                    </p>
+                                    <div class="bosluk3"></div>
+                                    <p class="listtext"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div> 
+                </div>
+                <div class="season_tab">
+                    <input type="radio" id="tab-2" name="tab-group-1" checked>
+                    <label for="tab-2">Tầm nhìn</label>
+                    <div class="season_content">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-lg-5">
+                                    <img src="img/about-us2.jpg" alt="">
+                                </div>
+                                <div class="col-lg-7">
+                                    <p class="listtext">
+                                        Trở thành trung tâm hàng đầu, giúp trẻ em sáng tạo, rèn luyện tư duy và làm chủ công nghệ, sẵn sàng cho tương lai số.
+                                    </p>
+                                    <div class="bosluk3"></div>
+                                    <p class="listtext"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div> 
+                </div>
+                <div class="season_tab">
+                    <input type="radio" id="tab-3" name="tab-group-1" checked>
+                    <label for="tab-3">Sứ mệnh</label>
+                    <div class="season_content">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-lg-5">
+                                    <img src="img/about-us3.jpg" alt="">
+                                </div>
+                                <div class="col-lg-7">
+                                    <p class="listtext">
+                                        Truyền cảm hứng, cung cấp kiến thức và trang bị kỹ năng công nghệ, giúp trẻ tự tin sáng tạo và phát triển trong kỷ nguyên số.
+                                    </p>
+                                    <div class="bosluk3"></div>
+                                    <p class="listtext"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div> 
+                </div>
+                <div class="season_tab">
+                    <input type="radio" id="tab-4" name="tab-group-1" checked>
+                    <label for="tab-4">Giá trị cốt lõi</label>
+                    <div class="season_content">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-lg-5">
+                                    <img src="img/about-us4.jpg" alt="">
+                                </div>
+                                <div class="col-lg-7">
+                                    <p class="listtext">
+                                        Sáng tạo, thực hành, tư duy công nghệ, hợp tác và trách nhiệm, giúp trẻ học hỏi, phát triển và ứng dụng công nghệ tích cực.
+                                    </p>
+                                    <div class="bosluk3"></div>
+                                    <p class="listtext"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div> 
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</section>
+<!--Yorumlar-->
+<section class="yorumlar-alani-sayfa">
+<div class="container">
+    <div class="row">
+    <div class="col-12">
+        <div class="h-yazi-ortalama h-yazi-margin-orta-3">
+            <h2 class="h2-baslik-hizmetler-2 wow fadeInUp" data-wow-delay="0.4s">Phụ huynh và học sinh<strong> Nói Gì Về Chúng Tôi</strong> </h2>
+        </div>
+        {{-- <div class="bosluk3ps"></div> --}}
+    </div>
+        <div class="col-12">
+        <div class="carousel-classes">
+                <div class="swiper-wrapper">
+            <div class="swiper-slide wow fadeInLeft" data-wow-delay="0.5s">
+                <div class="class-box">
+                <div class="testimonial-card">
+                    <div class="testimon-text">
+                        Học ở 8 Bit rất tốt.
+                        <i class="fas fa-quote-right quote"></i>
+                    </div>
+                    <div class="testimonialimg">
+                        <div class="testimonimg"><img src="img/testimonial1.png" alt="">
+                        </div>
+                        <h3 class='person'>Thành Anh</h3>
+                    </div>
+                    </div>
+                    </div>
+                    </div>
+                    <!-- end swiper-slide -->
+            <div class="swiper-slide wow fadeInLeft" data-wow-delay="0.6s">
+                <div class="class-box">
+                <div class="testimonial-card">
+                    <div class="testimon-text">
+                        Học ở 8 Bit rất tốt.
+                        <i class="fas fa-quote-right quote"></i>
+                    </div>
+                    <div class="testimonialimg">
+                        <div class="testimonimg"><img src="img/testimonial2.png" alt="">
+                        </div>
+                        <h3 class='person'>Mỹ Linh</h3>
+                    </div>
+                    </div>
+                </div>
+                    </div>
+                    <!-- end swiper-slide -->
+            <div class="swiper-slide wow fadeInRight" data-wow-delay="0.7s">
+                <div class="class-box">
+                <div class="testimonial-card">
+                    <div class="testimon-text">
+                        Học ở 8 Bit rất tốt.
+                        <i class="fas fa-quote-right quote"></i>
+                    </div>
+                    <div class="testimonialimg">
+                        <div class="testimonimg"><img src="img/testimonial3.png" alt="">
+                        </div>
+                        <h3 class='person'>Duyên</h3>
+                    </div>
+                    </div>
+                </div>
+                    </div>
+                    <!-- end swiper-slide -->
+            <div class="swiper-slide wow fadeInRight" data-wow-delay="0.8s">
+                <div class="class-box">
+                <div class="testimonial-card">
+                    <div class="testimon-text">
+                        Học ở 8 Bit rất tốt.
+                        <i class="fas fa-quote-right quote"></i>
+                    </div>
+                    <div class="testimonialimg">
+                        <div class="testimonimg"><img src="img/testimonial4.png" alt="">
+                        </div>
+                        <h3 class='person'>Huyền</h3>
+                    </div>
+                    </div>
+                    </div>
+                    </div>
+                    <!-- end swiper-slide -->
+            </div>
+            <!-- end swiper-wrapper -->
+            <div class="swiper-pagination"></div>
+            <!-- end swiper-pagination -->
+            </div>
+        </div>
+        <!-- end col-12 -->
+    </div>
+</div>
+</section>
+<!-- Accordion FAQ-->
+<section>
+<div class="container">
+    <div class="row">
+        <div class="col-xl-6">
+            <img src="{{ asset('img/loi-ich.jpg') }}" class="" alt="">
+        </div>
+        <div class="col-xl-6">
+            <div class="h-yazi-ortalama h-yazi-margin-orta-3">
+                <h2 class="h2-baslik-hizmetler-2"> Lợi ích khi tới với <strong>8-bit</strong> </h2> 
+            </div>
+                <p class="h2-baslik-hizmetler-yorum__yorum">
+                    8-bit luôn đặt trải nghiệm của học viên lên hàng đầu
+                </p>
+            <div class="bosluk3a"></div>
+            <div class="container asa">
+                <div class="question">
+                    Học và tương tác 1-1
+                </div>
+                <div class="answercont">
+                    <div class="answer">
+                        Giáo viên sẽ hướng dẫn và sửa lỗi trực tiếp 1-1 cho các bạn nhỏ.
+                    </div>
+                </div>
+                <div class="question">
+                    Cá nhân hóa lộ trình học
+                </div>
+                <div class="answercont">
+                    <div class="answer">
+                        Con được thiết kế lộ trình học riêng biệt theo các mức độ tiếp thu khác nhau
+                    </div>
+                </div>
+                <div class="question">
+                    Chủ động lịch học
+                </div>
+                <div class="answercont">
+                    <div class="answer">
+                        Thời gian học linh hoạt, phù hợp với lịch học cá nhân của con
+                    </div>
+                </div>
+                <div class="question">
+                    Định hướng tương lai
+                </div>
+                <div class="answercont">
+                    <div class="answer">
+                        Các con sẽ được tiếp xúc với công nghệ từ sớm góp phần định hướng ngành nghề trong tương lai                            
+                    </div>
+                </div>
+                <div class="question">
+                    Theo dõi dễ dàng
+                </div>
+                <div class="answercont">
+                    <div class="answer">
+                        Phụ huynh có thể nắm bắt tình hình của con một cách dễ dàng và có thể trải nghiệm thực tế cùng các con
+                    </div>
+                </div>
+                <div class="question">
+                    Thực hành liên tục
+                </div>
+                <div class="answercont">
+                    <div class="answer">
+                        Đan xen với việc học lý thuyết, các con sẽ được thực hành liên tục trong các buổi lên lớp để nắm vũng kiến thức
+                    </div>
+                </div>
+        </div>
+    </div>
+</div>
+</section>                                      
+    <!--Posts-->
+    <section class="blog-alani-sayfa">
+    <div class="container">
+        <div class="row">
+        <div class="col-12">
+            <div class="h-yazi-ortalama h-yazi-margin-orta-3">
+                <h2 class="h2-baslik-hizmetler-2 wow fadeInUp" data-wow-delay="0.3s">Resent <strong>Blog</strong> Post </h2>
+            </div>
+        </div>
+            <div class="col-12">
+            <div class="carousel-classes">
+              <div class="swiper-wrapper">
+                @foreach ($news as $newsItem)
+                  <div class="swiper-slide wow fadeInLeft" data-wow-delay="0.4s" data-tilt>
+                    <div class="post-kutu" onclick="location.href='what-is-a-suite-room.html';" style="cursor:pointer;">
+                        <img src="{{ asset($newsItem->image ?? 'images/default.png') }}" alt="Haber 1" class="haber-gorsel">
+                        <div class="datesection"><span class="date">{{ $newsItem->updated_at->format('H:i d/m/Y') }}</span>&nbsp;<span class="tt">-</span>&nbsp;<span class="category">Tin tức</span></div>
+                        <h3 class="baslik-3 h-yazi-margin-kucuk"> {{ $newsItem->title }}</h3>
+                        <p class="post-kutu--yazi">
+                            {{ $newsItem->short_intro }}
+                        </p>
+                        <div class="h-yazi-ortalama h-yazi-margin-4">
+                            <a href="{{ route('home.news.detail', ['news_slug' => $newsItem->slug]) }}" class="custom-button">Chi tiết</a>
+                        </div>
+                    </div>
+                  </div>
+                @endforeach
+                <!-- end swiper-slide -->
+              
+              </div>
+                <!-- end swiper-wrapper -->
+                <div class="swiper-pagination"></div>
+                <!-- end swiper-pagination -->
+                </div>
+            </div>
+            <!-- end col-12 -->
+        </div>
+    </div>
+    </section>
+    <section class="gallery-alani">
+        <div class="container">
+            <div class="row">
+            <div class="col-12">
+                <div class="h-yazi-ortalama h-yazi-margin-orta-3">
+                    <h2 class="h2-baslik-hizmetler-2 wow fadeInUp" data-wow-delay="0.5s">Gallery</h2>
+                </div>
+                <div class="bosluk3"></div>
+            </div>
+            </div>
+        </div>
+        <div class="grid-container wow fadeInUp" data-wow-delay="0.6s">
+            <div>
+              <img class='grid-item grid-item-1' src='img/gallery-8.jpg' alt="Galeri" onclick="openModal();currentSlide(1)" >
+            </div>
+            <div>
+              <img class='grid-item grid-item-2' src='img/gallery-2.jpg' alt="Galeri" onclick="openModal();currentSlide(2)" >
+            </div>
+            <div>
+              <img class='grid-item grid-item-3' src='img/gallery-3.jpg' alt="Galeri" onclick="openModal();currentSlide(3)" >
+            </div>
+            <div>
+              <img class='grid-item grid-item-4' src='img/gallery-7.jpg' alt="Galeri" onclick="openModal();currentSlide(4)" >
+            </div>
+            <div>
+              <img class='grid-item grid-item-5' src='img/gallery-5.jpg' alt="Galeri" onclick="openModal();currentSlide(5)" >
+            </div>
+            <div>
+              <img class='grid-item grid-item-6' src='img/gallery-3.jpg' alt="Galeri" onclick="openModal();currentSlide(6)" >
+            </div>
+            <div>
+              <img class='grid-item grid-item-7' src='img/gallery-7.jpg' alt="Galeri" onclick="openModal();currentSlide(7)" >
+            </div>
+            <div>
+              <img class='grid-item grid-item-8' src='img/gallery-8.jpg' alt="Galeri" onclick="openModal();currentSlide(8)" >
+            </div>
+            <div>
+              <img class='grid-item grid-item-9' src='img/gallery-9.jpg' alt="Galeri" onclick="openModal();currentSlide(9)" >
+            </div>
+            <div>
+              <img class='grid-item grid-item-10' src='img/gallery-10.jpg' alt="Galeri" onclick="openModal();currentSlide(10)" >
+            </div>
+          </div>
+          <!-- The Modal/Lightbox -->
+        <div id="myModal" class="modal">
+            <span class="close cursor" onclick="closeModal()">&times;</span>
+            <div class="modal-content">
+                <div class="mySlides">
+                    <img src="img/gallery-8.jpg" alt="Galeri" style="width:100%">
+                  </div>
+                <div class="mySlides">
+                    <img src="img/gallery-2.jpg" alt="Galeri" style="width:100%">
+                </div>
+                <div class="mySlides">
+                    <img src="img/gallery-3.jpg" alt="Galeri" style="width:100%">
+                  </div>
+                <div class="mySlides">
+                    <img src="img/gallery-7.jpg" alt="Galeri" style="width:100%">
+                </div> 
+                <div class="mySlides">
+                    <img src="img/gallery-5.jpg" alt="Galeri" style="width:100%">
+                  </div>
+                <div class="mySlides">
+                    <img src="img/gallery-3.jpg" alt="Galeri" style="width:100%">
+                </div> 
+                <div class="mySlides">
+                    <img src="img/gallery-7.jpg" alt="Galeri" style="width:100%">
+                  </div>
+                <div class="mySlides">
+                    <img src="img/gallery-8.jpg" alt="Galeri" style="width:100%">
+                </div> 
+                <div class="mySlides">
+                    <img src="img/gallery-9.jpg" alt="Galeri" style="width:100%">
+                  </div>
+                <div class="mySlides">
+                    <img src="img/gallery-10.jpg" alt="Galeri" style="width:100%">
+                </div>
+            </div>
+            <!-- Next/previous controls -->
+            <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
+            <a class="next" onclick="plusSlides(1)">&#10095;</a>
+  
+            <!-- Caption text -->
+            <div class="caption-container">
+              <p id="caption"></p>
+            </div>
+            <!-- Thumbnail image controls -->
+            <div class="grid-container">
+              <img class="demo" src="img/gallery-8.jpg" onclick="currentSlide(1)" alt="Image Name 1" style="display: none; width:1%;">
+              <img class="demo" src="img/gallery-2.jpg" onclick="currentSlide(2)" alt="Image Name 2" style="display: none; width:1%;">
+              <img class="demo" src="img/gallery-3.jpg" onclick="currentSlide(3)" alt="Image Name 3" style="display: none; width:1%;">
+              <img class="demo" src="img/gallery-7.jpg" onclick="currentSlide(4)" alt="Image Name 4" style="display: none; width:1%;">
+              <img class="demo" src="img/gallery-5.jpg" onclick="currentSlide(4)" alt="Image Name 5" style="display: none; width:1%;">
+              <img class="demo" src="img/gallery-3.jpg" onclick="currentSlide(4)" alt="Image Name 6" style="display: none; width:1%;">
+              <img class="demo" src="img/gallery-7.jpg" onclick="currentSlide(4)" alt="Image Name 7" style="display: none; width:1%;">
+              <img class="demo" src="img/gallery-8.jpg" onclick="currentSlide(4)" alt="Image Name 8" style="display: none; width:1%;">
+            </div>
+        </div>   
+    </section>
 @endsection

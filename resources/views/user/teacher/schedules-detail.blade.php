@@ -64,60 +64,7 @@
             height: 0;
         }
 
-        /* Thiết kế nút trượt */
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #f44336;
-            /* Màu đỏ cho Vắng mặt */
-            transition: .4s;
-            border-radius: 26px;
-            text-align: right;
-            padding: 0 8px;
-            line-height: 26px;
-            color: white;
-            font-weight: bold;
-            font-size: 11px;
-        }
-
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 20px;
-            width: 20px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-
-        input:checked+.slider {
-            background-color: #28a745;
-            /* Màu xanh cho Có mặt */
-            text-align: left;
-        }
-
-        input:focus+.slider {
-            box-shadow: 0 0 1px #28a745;
-        }
-
-        input:checked+.slider:before {
-            transform: translateX(64px);
-        }
-
-        /* Text cho trạng thái */
-        .slider:after {
-            content: "Vắng mặt";
-        }
-
-        input:checked+.slider:after {
-            content: "Có mặt";
-        }
+        
 
         /*  */
         #assignmentModal {
@@ -542,7 +489,7 @@
                                     <h4 class="mb-4 text-primary d-flex justify-content-between align-items-center">
                                         Danh sách học sinh
                                         <button type="button" class="btn btn-success" data-id="{{ $scheduleData->id }}"
-                                            onclick="openModal(this)">
+                                            onclick="openModalStudent(this)">
                                             <i class="bi bi-plus-circle me-2"></i>Thêm học sinh
                                         </button>
                                     </h4>
@@ -577,7 +524,7 @@
                                                                             data-student-id="{{ $student->id }}"
                                                                             onchange="updateAttendance(this)"
                                                                             {{ isset($attendance[$student->id]) && $attendance[$student->id]['status'] == 1 ? 'checked' : '' }}>
-                                                                        <span class="slider"></span>
+                                                                        <span class="switch_slider"></span>
                                                                     </label>
                                                                     <input type="hidden"
                                                                         name="attendance[{{ $student->id }}][status]"
@@ -616,11 +563,11 @@
         </main>
 
         <!-- Modal -->
-        <div class="modal" id="modal" onclick="closeModal(event)">
+        <div class="modal" id="modal" onclick="closeModalStudent(event)">
             <div class="modal-content" onclick="event.stopPropagation()">
                 <div class="modal-header">
                     <div>Thêm học sinh</div>
-                    <span onclick="closeModal(event)">×</span>
+                    <span onclick="closeModalStudent(event)">×</span>
                 </div>
 
                 <div class="form-note">
@@ -641,7 +588,7 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button class="btn btn-cancel" onclick="closeModal(event)">Đóng</button>
+                    <button class="btn btn-cancel" onclick="closeModalStudent(event)">Đóng</button>
                     <button class="btn btn-submit" id="submitButton" onclick="saveForm(event)">Thêm học sinh</button>
                 </div>
             </div>
@@ -717,7 +664,7 @@
             }
 
             let scheduleId; // Biến toàn cục để lưu classId
-            function openModal(button) {
+            function openModalStudent(button) {
                 // classId = button.getAttribute('data-id');
                 scheduleId = button.getAttribute('data-id');
                 document.getElementById('modal').style.display = 'block';
@@ -763,7 +710,7 @@
             }
 
 
-            function closeModal(event) {
+            function closeModalStudent(event) {
                 document.getElementById("modal").style.display = "none";
                 // selectedLessons = [];
                 scheduleId = null; // Reset classId để tránh sử dụng sai
@@ -808,7 +755,7 @@
                         console.log('Phản hồi từ /schedule/students/save:', data);
                         if (data.success) {
                             alert('Dữ liệu đã được lưu thành công!');
-                            closeModal(); // Đóng modal sau khi lưu
+                            closeModalStudent(); // Đóng modal sau khi lưu
                             window.location.reload(); // Tải lại trang
                         } else {
                             alert('Lỗi: ' + (data.message || 'Không thể lưu dữ liệu.'));

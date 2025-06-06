@@ -32,8 +32,7 @@ use Illuminate\Support\Facades\Route;
 Auth::routes();
 
 Route::get('/', [HomeController::class, 'index'])->name('home.index');
-Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
-Route::get('/shop/{product_slug}', [ShopController::class, 'productDetails'])->name('shop.product.details');
+
 
 //Cart
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
@@ -67,6 +66,20 @@ Route::get('/search', [HomeController::class, 'search'])->name('home.search');
 
 //About
 Route::get('/about', [HomeController::class, 'about'])->name('home.about');
+
+//Khóa học
+Route::get('/coures', [HomeController::class, 'coures'])->name('home.coures');
+
+//Sản phẩm
+Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
+Route::get('/shop/{product_slug}', [ShopController::class, 'productDetails'])->name('shop.product.details');
+
+//Hoạt động
+Route::get('/activities', [HomeController::class, 'activities'])->name('home.activities');
+
+//Tin tức
+Route::get('/news', [HomeController::class, 'news'])->name('home.news');
+Route::get('/news/{news_slug}', [HomeController::class, 'newsDetail'])->name('home.news.detail');
 
 //User Account
 
@@ -174,6 +187,14 @@ Route::middleware(['auth', AuthAdmin::class])->group(function () {
     Route::put('/admin/setting/changePassword', [AdminController::class, 'changePassword'])->name('admin.setting.changePassword');
 
     //Products
+    Route::get('/admin/product/search', [AdminController::class, 'searchProduct'])->name('admin.product.search');
+    Route::get('/admin/products', [AdminController::class, 'products'])->name('admin.products');
+    Route::get('/admin/product/add', [AdminController::class, 'addProduct'])->name('admin.product.add');
+    Route::post('/admin/product/store', [AdminController::class,'storeProduct'])->name('admin.product.store');
+    Route::get('/admin/product/edit/{id}', [AdminController::class, 'editProduct'])->name('admin.product.edit');
+    Route::get('/admin/product/view/{id}', [AdminController::class, 'viewProduct'])->name('admin.product.view');
+    Route::put('/admin/product/update', [AdminController::class, 'updateProduct'])->name('admin.product.update'); /* Lưu ý cái này */
+    Route::delete('/admin/product/{id}/delete', [AdminController::class, 'deleteProduct'])->name('admin.product.delete'); /* Lưu ý cái này */
 
     //Brands
     Route::get('/admin/brands', [AdminController::class, 'brands'])->name('admin.brands');

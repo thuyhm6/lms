@@ -262,10 +262,10 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse ($parents as $parent)
+                            @forelse ($parents as $key => $parent)
                                 <tr>
                                     <td class="text-center">
-                                        {{ ($parents->currentPage() - 1) * $parents->perPage() + $loop->iteration }}
+                                        {{ $parents->firstItem() + $key }}
                                     </td>
                                     <td class="text-center">
                                         <div class="action-dropdown">

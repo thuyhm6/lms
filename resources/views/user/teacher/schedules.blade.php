@@ -222,8 +222,7 @@
                                                     {{ $class->class_code ?? 'Chưa có' }}</span>
                                             </td>
                                             <td>
-                                                <a style="color: #007bff" href="{{ route('schedules.students', $class->schedule_id) }}">Xem danh
-                                                    sách({{ $class->student_count }})</a>
+                                                <a style="color: #007bff" href="{{ route('schedules.students', $class->schedule_id) }}">Xem danh sách({{ $class->student_count }})</a>
                                             </td>
                                             <td>{{ $class->schedule_notes ?? 'Không có' }}</td>
                                             <td><span class="content-lession">{{ $class->learning_format ?? 'Chưa có' }}</span></td>
