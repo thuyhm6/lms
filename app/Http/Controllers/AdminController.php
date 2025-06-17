@@ -740,7 +740,7 @@ class AdminController extends Controller
         ]);
         
         // Rest of the method...
-    } catch (\Exception $e) {
+    } catch (Exception $e) {
         Log::error('Error updating appointment status: ' . $e->getMessage());
         return response()->json([
             'success' => false,
@@ -789,7 +789,7 @@ class AdminController extends Controller
                 'errors' => $e->errors()
             ], 422);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             DB::rollBack();
             Log::error('Error updating parent status: ' . $e->getMessage(), [
                 'request' => $request->all(),
